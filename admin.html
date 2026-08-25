@@ -1,0 +1,634 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MIKU.39 Admin Dashboard</title>
+    <link rel="stylesheet" href="style.css">
+    <style>
+        .admin-container {
+            max-width: 1000px;
+            margin: 0 auto;
+            padding: 40px 20px;
+        }
+
+        .admin-header {
+            text-align: center;
+            margin-bottom: 40px;
+            animation: fadeInDown 0.8s ease-out;
+        }
+
+        .admin-header h1 {
+            font-size: 2.5rem;
+            background: linear-gradient(90deg, var(--primary-cyan), var(--primary-magenta));
+            -webkit-background-clip: text;
+            background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin-bottom: 10px;
+        }
+
+        .admin-header p {
+            color: var(--text-dim);
+            font-size: 1.1rem;
+            letter-spacing: 1px;
+        }
+
+        .admin-section {
+            background: rgba(0, 212, 255, 0.08);
+            border: 2px solid var(--primary-cyan);
+            border-radius: 10px;
+            padding: 30px;
+            margin-bottom: 30px;
+            animation: fadeInUp 0.8s ease-out both;
+        }
+
+        .admin-section:nth-child(2) { animation-delay: 0.2s; }
+        .admin-section:nth-child(3) { animation-delay: 0.3s; }
+        .admin-section:nth-child(4) { animation-delay: 0.4s; }
+
+        .section-title {
+            font-size: 1.3rem;
+            color: var(--primary-magenta);
+            margin-bottom: 20px;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            text-shadow: 0 0 10px rgba(255, 0, 110, 0.5);
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-group label {
+            display: block;
+            color: var(--text-light);
+            margin-bottom: 8px;
+            font-weight: bold;
+            letter-spacing: 0.5px;
+        }
+
+        .form-group input,
+        .form-group textarea,
+        .form-group select {
+            width: 100%;
+            padding: 12px;
+            background: rgba(0, 0, 0, 0.3);
+            border: 1px solid var(--primary-cyan);
+            border-radius: 5px;
+            color: var(--text-light);
+            font-family: 'Courier New', monospace;
+            font-size: 0.95rem;
+            transition: all 0.3s ease;
+        }
+
+        .form-group input:focus,
+        .form-group textarea:focus,
+        .form-group select:focus {
+            outline: none;
+            border-color: var(--primary-magenta);
+            box-shadow: 0 0 20px rgba(0, 212, 255, 0.3);
+            background: rgba(0, 0, 0, 0.5);
+        }
+
+        .form-group textarea {
+            resize: vertical;
+            min-height: 80px;
+        }
+
+        .button-group {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+
+        button {
+            padding: 12px 25px;
+            background: linear-gradient(90deg, var(--primary-cyan), var(--secondary-purple));
+            color: var(--dark-bg);
+            border: none;
+            border-radius: 5px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            font-size: 0.9rem;
+        }
+
+        button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 30px rgba(0, 212, 255, 0.4);
+        }
+
+        button:active {
+            transform: translateY(0);
+        }
+
+        .button-secondary {
+            background: rgba(0, 212, 255, 0.2);
+            color: var(--primary-cyan);
+            border: 2px solid var(--primary-cyan);
+        }
+
+        .button-secondary:hover {
+            background: var(--primary-cyan);
+            color: var(--dark-bg);
+        }
+
+        .button-danger {
+            background: rgba(255, 0, 110, 0.3);
+            color: var(--primary-magenta);
+            border: 2px solid var(--primary-magenta);
+        }
+
+        .button-danger:hover {
+            background: var(--primary-magenta);
+            color: var(--dark-bg);
+        }
+
+        .game-list,
+        .player-list {
+            display: grid;
+            gap: 15px;
+        }
+
+        .game-item,
+        .player-item {
+            background: rgba(0, 0, 0, 0.2);
+            border-left: 3px solid var(--primary-cyan);
+            padding: 15px;
+            border-radius: 5px;
+            display: grid;
+            grid-template-columns: 1fr auto;
+            align-items: center;
+            gap: 15px;
+            animation: slideInLeft 0.5s ease-out;
+        }
+
+        .game-item:nth-child(1) { animation-delay: 0.1s; }
+        .game-item:nth-child(2) { animation-delay: 0.15s; }
+        .game-item:nth-child(3) { animation-delay: 0.2s; }
+        .game-item:nth-child(4) { animation-delay: 0.25s; }
+
+        .game-info h4 {
+            color: var(--primary-cyan);
+            margin-bottom: 5px;
+        }
+
+        .game-info p {
+            color: var(--text-dim);
+            font-size: 0.9rem;
+            word-break: break-all;
+        }
+
+        .status-badge {
+            display: inline-block;
+            padding: 5px 12px;
+            background: rgba(0, 212, 255, 0.2);
+            border: 1px solid var(--primary-cyan);
+            border-radius: 20px;
+            font-size: 0.85rem;
+            color: var(--primary-cyan);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            font-weight: bold;
+        }
+
+        .status-badge.active {
+            background: rgba(0, 212, 255, 0.4);
+            border-color: var(--primary-cyan);
+        }
+
+        .feedback {
+            padding: 15px;
+            border-radius: 5px;
+            margin-bottom: 15px;
+            display: none;
+            animation: slideInUp 0.3s ease-out;
+        }
+
+        .feedback.success {
+            background: rgba(0, 212, 255, 0.2);
+            border: 1px solid var(--primary-cyan);
+            color: var(--primary-cyan);
+            display: block;
+        }
+
+        .feedback.error {
+            background: rgba(255, 0, 110, 0.2);
+            border: 1px solid var(--primary-magenta);
+            color: var(--primary-magenta);
+            display: block;
+        }
+
+        .data-export {
+            background: rgba(0, 0, 0, 0.2);
+            border: 1px dashed var(--primary-cyan);
+            border-radius: 5px;
+            padding: 15px;
+            margin-top: 15px;
+            max-height: 200px;
+            overflow-y: auto;
+            font-family: 'Courier New', monospace;
+            font-size: 0.85rem;
+            color: var(--text-dim);
+            word-break: break-all;
+        }
+
+        .info-box {
+            background: rgba(0, 212, 255, 0.1);
+            border-left: 4px solid var(--primary-cyan);
+            padding: 15px;
+            border-radius: 5px;
+            margin-bottom: 20px;
+            font-size: 0.95rem;
+        }
+
+        .info-box strong {
+            color: var(--primary-cyan);
+        }
+
+        @media (max-width: 768px) {
+            .admin-container {
+                padding: 20px 15px;
+            }
+
+            .admin-header h1 {
+                font-size: 1.8rem;
+            }
+
+            .game-item {
+                grid-template-columns: 1fr;
+            }
+
+            .button-group {
+                flex-direction: column;
+            }
+
+            button {
+                width: 100%;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="background">
+        <div class="grid-background"></div>
+        <svg class="miku-silhouette" viewBox="0 0 300 600" xmlns="http://www.w3.org/2000/svg">
+            <circle cx="150" cy="80" r="35" fill="currentColor"/>
+            <ellipse cx="80" cy="60" rx="25" ry="45" fill="currentColor"/>
+            <ellipse cx="220" cy="60" rx="25" ry="45" fill="currentColor"/>
+            <rect x="140" y="110" width="20" height="20" fill="currentColor"/>
+            <path d="M 120 130 L 100 220 L 110 240 L 140 240 L 140 160 L 160 160 L 160 240 L 190 240 L 200 220 L 180 130 Z" fill="currentColor"/>
+            <rect x="60" y="145" width="40" height="15" rx="7" fill="currentColor" transform="rotate(-30 80 152)"/>
+            <path d="M 50 185 Q 40 220 45 260" stroke="currentColor" stroke-width="12" fill="none" stroke-linecap="round"/>
+            <rect x="200" y="145" width="40" height="15" rx="7" fill="currentColor" transform="rotate(30 220 152)"/>
+            <path d="M 250 185 Q 260 220 255 260" stroke="currentColor" stroke-width="12" fill="none" stroke-linecap="round"/>
+            <rect x="125" y="240" width="15" height="80" fill="currentColor"/>
+            <ellipse cx="132" cy="330" rx="12" ry="20" fill="currentColor"/>
+            <rect x="160" y="240" width="15" height="80" fill="currentColor"/>
+            <ellipse cx="167" cy="330" rx="12" ry="20" fill="currentColor"/>
+        </svg>
+        <div class="particles">
+            <div class="particle"></div>
+            <div class="particle"></div>
+            <div class="particle"></div>
+            <div class="particle"></div>
+            <div class="particle"></div>
+        </div>
+    </div>
+
+    <div class="content">
+        <div class="admin-container">
+            <div class="admin-header">
+                <h1>⚙️ ADMIN DASHBOARD</h1>
+                <p>Manage MIKU.39 Birthday Event</p>
+            </div>
+
+            <!-- Game Management Section -->
+            <div class="admin-section">
+                <h2 class="section-title">🎮 Game Management</h2>
+                <div class="info-box">
+                    <strong>💡 Note:</strong> Add or update game links here. Changes appear on the schedule page immediately.
+                </div>
+
+                <div class="form-group">
+                    <label for="gameName">Game Title</label>
+                    <input type="text" id="gameName" placeholder="e.g., Quiz Master" value="Quiz Master">
+                </div>
+
+                <div class="form-group">
+                    <label for="gameEmoji">Emoji Icon</label>
+                    <input type="text" id="gameEmoji" placeholder="e.g., 🎯" value="🎯" maxlength="2" style="max-width: 100px;">
+                </div>
+
+                <div class="form-group">
+                    <label for="gameDescription">Description</label>
+                    <textarea id="gameDescription" placeholder="Describe the game...">Test your Miku knowledge with our trivia challenge!</textarea>
+                </div>
+
+                <div class="form-group">
+                    <label for="gameLink">Game URL</label>
+                    <input type="url" id="gameLink" placeholder="https://your-game-url.com">
+                </div>
+
+                <div class="button-group">
+                    <button onclick="addGame()">✚ Add Game</button>
+                    <button class="button-secondary" onclick="exportGames()">📥 Export Games</button>
+                </div>
+
+                <div id="gameFeedback" class="feedback"></div>
+
+                <div id="gamesList" class="game-list" style="margin-top: 25px;">
+                    <!-- Games will be listed here -->
+                </div>
+            </div>
+
+            <!-- Player/Leaderboard Management -->
+            <div class="admin-section">
+                <h2 class="section-title">💰 Leaderboard Management</h2>
+                <div class="info-box">
+                    <strong>💡 Note:</strong> Add or update player scores. Use this to maintain Mikudollars rankings throughout the event.
+                </div>
+
+                <div class="form-group">
+                    <label for="playerName">Player Name</label>
+                    <input type="text" id="playerName" placeholder="Enter player name">
+                </div>
+
+                <div class="form-group">
+                    <label for="playerScore">Mikudollars</label>
+                    <input type="number" id="playerScore" placeholder="0" min="0" value="0">
+                </div>
+
+                <div class="form-group">
+                    <label for="gameCategory">Game Category</label>
+                    <select id="gameCategory">
+                        <option value="overall">Overall Rankings</option>
+                        <option value="quiz">Quiz Master</option>
+                        <option value="rhythm">Rhythm Challenge</option>
+                        <option value="creative">Creative Contest</option>
+                        <option value="speed">Speed Race</option>
+                    </select>
+                </div>
+
+                <div class="button-group">
+                    <button onclick="addPlayer()">✚ Add/Update Score</button>
+                    <button class="button-secondary" onclick="exportLeaderboard()">📥 Export Scores</button>
+                    <button class="button-danger" onclick="clearLeaderboard()">🗑️ Clear All</button>
+                </div>
+
+                <div id="playerFeedback" class="feedback"></div>
+
+                <div id="playersList" class="player-list" style="margin-top: 25px;">
+                    <!-- Players will be listed here -->
+                </div>
+            </div>
+
+            <!-- Event Status -->
+            <div class="admin-section">
+                <h2 class="section-title">📊 Event Status</h2>
+                <div class="info-box">
+                    <strong>Event Date:</strong> August 30, 2026 · 3:00 PM SGT<br>
+                    <strong>Schedule Page:</strong> <a href="schedule.html?unlocked=true" style="color: var(--primary-cyan); text-decoration: none;">schedule.html?unlocked=true</a><br>
+                    <strong>Public Page:</strong> <a href="index.html" style="color: var(--primary-cyan); text-decoration: none;">index.html</a>
+                </div>
+
+                <div style="margin-top: 20px; padding: 15px; background: rgba(0, 212, 255, 0.1); border-left: 4px solid var(--primary-cyan); border-radius: 5px;">
+                    <p style="color: var(--text-dim); font-size: 0.95rem; margin: 0;">
+                        ✨ <strong>Pro Tip:</strong> Use the export functions to backup your data, or import it into a spreadsheet for easier management during the event.
+                    </p>
+                </div>
+
+                <div class="button-group" style="margin-top: 20px;">
+                    <a href="schedule.html?unlocked=true" style="text-decoration: none;">
+                        <button class="button-secondary">👁️ Preview Schedule</button>
+                    </a>
+                    <a href="index.html" style="text-decoration: none;">
+                        <button class="button-secondary">📍 View Countdown</button>
+                    </a>
+                </div>
+            </div>
+
+            <!-- Data Management -->
+            <div class="admin-section">
+                <h2 class="section-title">💾 Data Management</h2>
+                <div class="info-box">
+                    <strong>⚠️ Note:</strong> This data is stored in your browser's localStorage. Clear browser data to reset.
+                </div>
+
+                <button onclick="exportAllData()" class="button-secondary">📦 Export All Data</button>
+                <button onclick="clearAllData()" class="button-danger" style="margin-left: 10px;">🗑️ Clear Everything</button>
+
+                <div id="dataExport" class="data-export" style="margin-top: 15px; display: none;"></div>
+            </div>
+
+            <div style="text-align: center; margin-top: 40px; padding-top: 20px; border-top: 1px dashed rgba(0, 212, 255, 0.3); color: var(--text-dim);">
+                <p>🎂 Made with ❤️ for Miku's Birthday 🎂</p>
+                <p style="font-size: 0.9rem; margin-top: 10px;">
+                    <a href="schedule.html?unlocked=true" style="color: var(--primary-cyan); text-decoration: none;">Back to Schedule</a>
+                </p>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const STORAGE_KEY_GAMES = 'miku_games';
+        const STORAGE_KEY_PLAYERS = 'miku_players';
+
+        // Load data from localStorage
+        function loadGames() {
+            return JSON.parse(localStorage.getItem(STORAGE_KEY_GAMES) || '[]');
+        }
+
+        function loadPlayers() {
+            return JSON.parse(localStorage.getItem(STORAGE_KEY_PLAYERS) || '[]');
+        }
+
+        // Save data to localStorage
+        function saveGames(games) {
+            localStorage.setItem(STORAGE_KEY_GAMES, JSON.stringify(games));
+            renderGames();
+        }
+
+        function savePlayers(players) {
+            localStorage.setItem(STORAGE_KEY_PLAYERS, JSON.stringify(players));
+            renderPlayers();
+        }
+
+        // Add game
+        function addGame() {
+            const name = document.getElementById('gameName').value.trim();
+            const emoji = document.getElementById('gameEmoji').value.trim();
+            const description = document.getElementById('gameDescription').value.trim();
+            const link = document.getElementById('gameLink').value.trim();
+
+            if (!name || !emoji || !description || !link) {
+                showFeedback('gameFeedback', 'Please fill in all fields', 'error');
+                return;
+            }
+
+            const games = loadGames();
+            games.push({ id: Date.now(), name, emoji, description, link, created: new Date().toLocaleString() });
+            saveGames(games);
+
+            document.getElementById('gameName').value = '';
+            document.getElementById('gameEmoji').value = '';
+            document.getElementById('gameDescription').value = '';
+            document.getElementById('gameLink').value = '';
+
+            showFeedback('gameFeedback', '✓ Game added successfully!', 'success');
+        }
+
+        // Add/Update player
+        function addPlayer() {
+            const name = document.getElementById('playerName').value.trim();
+            const score = parseInt(document.getElementById('playerScore').value) || 0;
+            const category = document.getElementById('gameCategory').value;
+
+            if (!name) {
+                showFeedback('playerFeedback', 'Please enter a player name', 'error');
+                return;
+            }
+
+            const players = loadPlayers();
+            const existingIndex = players.findIndex(p => p.name === name && p.category === category);
+
+            if (existingIndex >= 0) {
+                players[existingIndex].score = score;
+            } else {
+                players.push({ id: Date.now(), name, score, category });
+            }
+
+            savePlayers(players);
+            document.getElementById('playerName').value = '';
+            document.getElementById('playerScore').value = '0';
+
+            showFeedback('playerFeedback', '✓ Player score updated!', 'success');
+        }
+
+        // Render games
+        function renderGames() {
+            const games = loadGames();
+            const container = document.getElementById('gamesList');
+
+            if (games.length === 0) {
+                container.innerHTML = '<p style="color: var(--text-dim); text-align: center;">No games added yet</p>';
+                return;
+            }
+
+            container.innerHTML = games.map(game => `
+                <div class="game-item">
+                    <div class="game-info">
+                        <h4>${game.emoji} ${game.name}</h4>
+                        <p>${game.link}</p>
+                        <p style="font-size: 0.8rem; margin-top: 5px; color: var(--text-dim);">${game.description}</p>
+                    </div>
+                    <button class="button-danger" onclick="deleteGame(${game.id})">Delete</button>
+                </div>
+            `).join('');
+        }
+
+        // Render players
+        function renderPlayers() {
+            const players = loadPlayers();
+            const container = document.getElementById('playersList');
+
+            if (players.length === 0) {
+                container.innerHTML = '<p style="color: var(--text-dim); text-align: center;">No players added yet</p>';
+                return;
+            }
+
+            const sorted = [...players].sort((a, b) => b.score - a.score);
+
+            container.innerHTML = sorted.map((player, index) => `
+                <div class="player-item">
+                    <div>
+                        <strong style="color: var(--primary-cyan);">${player.name}</strong>
+                        <span style="margin-left: 10px; font-size: 0.85rem; color: var(--text-dim);">[${player.category}]</span>
+                        <p style="color: var(--primary-magenta); margin-top: 5px; font-weight: bold;">💰 ${player.score}</p>
+                    </div>
+                    <button class="button-danger" onclick="deletePlayer(${player.id})">Delete</button>
+                </div>
+            `).join('');
+        }
+
+        // Delete functions
+        function deleteGame(id) {
+            if (confirm('Delete this game?')) {
+                const games = loadGames();
+                saveGames(games.filter(g => g.id !== id));
+                showFeedback('gameFeedback', '✓ Game deleted', 'success');
+            }
+        }
+
+        function deletePlayer(id) {
+            if (confirm('Delete this player?')) {
+                const players = loadPlayers();
+                savePlayers(players.filter(p => p.id !== id));
+                showFeedback('playerFeedback', '✓ Player deleted', 'success');
+            }
+        }
+
+        function clearLeaderboard() {
+            if (confirm('Clear all player scores?')) {
+                localStorage.setItem(STORAGE_KEY_PLAYERS, '[]');
+                renderPlayers();
+                showFeedback('playerFeedback', '✓ Leaderboard cleared', 'success');
+            }
+        }
+
+        function clearAllData() {
+            if (confirm('This will delete ALL games and players. Are you sure?')) {
+                localStorage.removeItem(STORAGE_KEY_GAMES);
+                localStorage.removeItem(STORAGE_KEY_PLAYERS);
+                renderGames();
+                renderPlayers();
+                showFeedback('gameFeedback', '✓ All data cleared', 'success');
+            }
+        }
+
+        // Export functions
+        function exportGames() {
+            const games = loadGames();
+            const dataStr = JSON.stringify(games, null, 2);
+            showExportData(dataStr);
+        }
+
+        function exportLeaderboard() {
+            const players = loadPlayers();
+            const dataStr = JSON.stringify(players, null, 2);
+            showExportData(dataStr);
+        }
+
+        function exportAllData() {
+            const data = {
+                games: loadGames(),
+                players: loadPlayers(),
+                exported: new Date().toISOString()
+            };
+            const dataStr = JSON.stringify(data, null, 2);
+            showExportData(dataStr);
+        }
+
+        function showExportData(data) {
+            const container = document.getElementById('dataExport');
+            container.textContent = data;
+            container.style.display = 'block';
+        }
+
+        function showFeedback(elementId, message, type) {
+            const el = document.getElementById(elementId);
+            el.textContent = message;
+            el.className = `feedback ${type}`;
+            setTimeout(() => {
+                el.className = 'feedback';
+            }, 3000);
+        }
+
+        // Initial render
+        renderGames();
+        renderPlayers();
+    </script>
+</body>
+</html>

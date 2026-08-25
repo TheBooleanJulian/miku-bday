@@ -1,0 +1,622 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MIKU.39 Birthday — Schedule & Leaderboard</title>
+    <link rel="stylesheet" href="style.css">
+    <style>
+        .schedule-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 40px 20px;
+        }
+
+        .locked-message {
+            text-align: center;
+            padding: 60px 20px;
+        }
+
+        .locked-message h2 {
+            font-size: 2rem;
+            color: var(--primary-magenta);
+            margin-bottom: 20px;
+            text-shadow: 0 0 20px rgba(255, 0, 110, 0.6);
+        }
+
+        .locked-message p {
+            font-size: 1.1rem;
+            color: var(--text-dim);
+            margin-bottom: 30px;
+        }
+
+        .back-link {
+            display: inline-block;
+            padding: 12px 30px;
+            border: 2px solid var(--primary-cyan);
+            color: var(--primary-cyan);
+            text-decoration: none;
+            border-radius: 5px;
+            transition: all 0.3s ease;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            font-weight: bold;
+        }
+
+        .back-link:hover {
+            background: var(--primary-cyan);
+            color: var(--dark-bg);
+            box-shadow: 0 0 20px rgba(0, 212, 255, 0.6);
+        }
+
+        .schedule-header {
+            text-align: center;
+            margin-bottom: 50px;
+            animation: fadeInDown 0.8s ease-out;
+        }
+
+        .schedule-header h1 {
+            font-size: 3rem;
+            background: linear-gradient(90deg, var(--primary-cyan), var(--primary-magenta));
+            -webkit-background-clip: text;
+            background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin-bottom: 10px;
+            letter-spacing: 2px;
+        }
+
+        .schedule-header p {
+            font-size: 1.2rem;
+            color: var(--text-dim);
+            letter-spacing: 1px;
+        }
+
+        /* Timeline/Schedule Section */
+        .timeline {
+            margin-bottom: 60px;
+            animation: fadeInUp 0.8s ease-out 0.2s both;
+        }
+
+        .timeline-title {
+            font-size: 1.5rem;
+            color: var(--primary-cyan);
+            text-shadow: 0 0 10px rgba(0, 212, 255, 0.5);
+            margin-bottom: 30px;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .timeline-item {
+            display: grid;
+            grid-template-columns: 120px 1fr;
+            gap: 30px;
+            margin-bottom: 25px;
+            padding-left: 20px;
+            border-left: 2px solid var(--primary-cyan);
+            animation: slideInLeft 0.6s ease-out both;
+        }
+
+        .timeline-item:nth-child(1) { animation-delay: 0.3s; }
+        .timeline-item:nth-child(2) { animation-delay: 0.35s; }
+        .timeline-item:nth-child(3) { animation-delay: 0.4s; }
+        .timeline-item:nth-child(4) { animation-delay: 0.45s; }
+        .timeline-item:nth-child(5) { animation-delay: 0.5s; }
+        .timeline-item:nth-child(6) { animation-delay: 0.55s; }
+
+        .timeline-time {
+            font-size: 1.2rem;
+            font-weight: bold;
+            color: var(--primary-magenta);
+            text-shadow: 0 0 10px rgba(255, 0, 110, 0.5);
+        }
+
+        .timeline-content {
+            background: rgba(0, 212, 255, 0.08);
+            border: 1px solid rgba(0, 212, 255, 0.3);
+            border-radius: 8px;
+            padding: 15px 20px;
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+
+        .timeline-content:hover {
+            background: rgba(0, 212, 255, 0.15);
+            border-color: var(--primary-magenta);
+            box-shadow: 0 0 20px rgba(0, 212, 255, 0.3);
+        }
+
+        .timeline-content h3 {
+            color: var(--primary-cyan);
+            margin-bottom: 5px;
+            font-size: 1.1rem;
+        }
+
+        .timeline-content p {
+            color: var(--text-dim);
+            font-size: 0.95rem;
+        }
+
+        /* Games Section */
+        .games-section {
+            margin-bottom: 60px;
+            animation: fadeInUp 0.8s ease-out 0.4s both;
+        }
+
+        .section-title {
+            font-size: 1.5rem;
+            color: var(--primary-magenta);
+            text-shadow: 0 0 10px rgba(255, 0, 110, 0.5);
+            margin-bottom: 30px;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .games-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+        }
+
+        .game-card {
+            background: rgba(0, 212, 255, 0.1);
+            border: 2px solid var(--primary-cyan);
+            border-radius: 10px;
+            padding: 25px;
+            text-decoration: none;
+            color: inherit;
+            transition: all 0.3s ease;
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+            cursor: pointer;
+            animation: slideInUp 0.6s ease-out both;
+        }
+
+        .game-card:nth-child(1) { animation-delay: 0.5s; }
+        .game-card:nth-child(2) { animation-delay: 0.55s; }
+        .game-card:nth-child(3) { animation-delay: 0.6s; }
+        .game-card:nth-child(4) { animation-delay: 0.65s; }
+
+        .game-card:hover {
+            border-color: var(--primary-magenta);
+            background: rgba(255, 0, 110, 0.1);
+            transform: translateY(-8px) scale(1.02);
+            box-shadow: 
+                0 0 30px rgba(255, 0, 110, 0.4),
+                0 20px 40px rgba(0, 0, 0, 0.5);
+        }
+
+        .game-icon {
+            font-size: 3rem;
+        }
+
+        .game-title {
+            font-size: 1.3rem;
+            font-weight: bold;
+            color: var(--primary-cyan);
+        }
+
+        .game-description {
+            font-size: 0.95rem;
+            color: var(--text-dim);
+            flex-grow: 1;
+        }
+
+        .game-link-btn {
+            display: inline-block;
+            padding: 10px 20px;
+            background: rgba(0, 212, 255, 0.2);
+            border: 1px solid var(--primary-cyan);
+            color: var(--primary-cyan);
+            border-radius: 5px;
+            text-align: center;
+            text-decoration: none;
+            font-size: 0.9rem;
+            font-weight: bold;
+            transition: all 0.3s ease;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .game-card:hover .game-link-btn {
+            background: var(--primary-cyan);
+            color: var(--dark-bg);
+        }
+
+        /* Leaderboard Section */
+        .leaderboard-section {
+            animation: fadeInUp 0.8s ease-out 0.6s both;
+        }
+
+        .leaderboard-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 30px;
+        }
+
+        .leaderboard {
+            background: rgba(0, 212, 255, 0.08);
+            border: 2px solid var(--primary-cyan);
+            border-radius: 10px;
+            padding: 25px;
+            box-shadow: 0 0 20px rgba(0, 212, 255, 0.2);
+        }
+
+        .leaderboard-title {
+            font-size: 1.2rem;
+            color: var(--primary-magenta);
+            margin-bottom: 20px;
+            text-align: center;
+            text-shadow: 0 0 10px rgba(255, 0, 110, 0.5);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .leaderboard-list {
+            list-style: none;
+        }
+
+        .leaderboard-item {
+            display: grid;
+            grid-template-columns: 30px 1fr auto;
+            gap: 15px;
+            align-items: center;
+            padding: 12px;
+            margin-bottom: 10px;
+            background: rgba(0, 212, 255, 0.05);
+            border-left: 3px solid var(--primary-cyan);
+            border-radius: 4px;
+            transition: all 0.3s ease;
+            animation: slideInLeft 0.5s ease-out both;
+        }
+
+        .leaderboard-item:hover {
+            background: rgba(0, 212, 255, 0.15);
+            border-left-color: var(--primary-magenta);
+        }
+
+        .leaderboard-item:nth-child(1) { animation-delay: 0.1s; }
+        .leaderboard-item:nth-child(2) { animation-delay: 0.15s; }
+        .leaderboard-item:nth-child(3) { animation-delay: 0.2s; }
+        .leaderboard-item:nth-child(4) { animation-delay: 0.25s; }
+        .leaderboard-item:nth-child(5) { animation-delay: 0.3s; }
+
+        .rank {
+            font-weight: bold;
+            font-size: 1.2rem;
+            color: var(--primary-magenta);
+            text-align: center;
+        }
+
+        .rank.gold {
+            color: #ffd700;
+            font-size: 1.5rem;
+        }
+
+        .rank.silver {
+            color: #c0c0c0;
+            font-size: 1.3rem;
+        }
+
+        .rank.bronze {
+            color: #cd7f32;
+            font-size: 1.1rem;
+        }
+
+        .player-name {
+            color: var(--text-light);
+            font-weight: 600;
+        }
+
+        .player-score {
+            color: var(--primary-cyan);
+            font-weight: bold;
+            text-shadow: 0 0 10px rgba(0, 212, 255, 0.6);
+        }
+
+        .admin-note {
+            font-size: 0.85rem;
+            color: var(--text-dim);
+            text-align: center;
+            margin-top: 30px;
+            padding-top: 20px;
+            border-top: 1px dashed rgba(0, 212, 255, 0.3);
+            font-style: italic;
+        }
+
+        /* Footer */
+        .schedule-footer {
+            text-align: center;
+            margin-top: 60px;
+            padding-top: 30px;
+            border-top: 1px dashed rgba(0, 212, 255, 0.3);
+            color: var(--text-dim);
+        }
+
+        .schedule-footer a {
+            color: var(--primary-cyan);
+            text-decoration: none;
+            transition: all 0.3s ease;
+        }
+
+        .schedule-footer a:hover {
+            color: var(--primary-magenta);
+            text-shadow: 0 0 10px rgba(255, 0, 110, 0.5);
+        }
+
+        @keyframes slideInLeft {
+            from {
+                opacity: 0;
+                transform: translateX(-30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateX(0);
+            }
+        }
+
+        @keyframes slideInUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @media (max-width: 768px) {
+            .schedule-container {
+                padding: 20px 15px;
+            }
+
+            .schedule-header h1 {
+                font-size: 2rem;
+            }
+
+            .timeline-item {
+                grid-template-columns: 1fr;
+                border-left: none;
+                border-top: 2px solid var(--primary-cyan);
+                padding-left: 0;
+                padding-top: 20px;
+            }
+
+            .games-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .leaderboard-container {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="background">
+        <div class="grid-background"></div>
+        <svg class="miku-silhouette" viewBox="0 0 300 600" xmlns="http://www.w3.org/2000/svg">
+            <circle cx="150" cy="80" r="35" fill="currentColor"/>
+            <ellipse cx="80" cy="60" rx="25" ry="45" fill="currentColor"/>
+            <ellipse cx="220" cy="60" rx="25" ry="45" fill="currentColor"/>
+            <rect x="140" y="110" width="20" height="20" fill="currentColor"/>
+            <path d="M 120 130 L 100 220 L 110 240 L 140 240 L 140 160 L 160 160 L 160 240 L 190 240 L 200 220 L 180 130 Z" fill="currentColor"/>
+            <rect x="60" y="145" width="40" height="15" rx="7" fill="currentColor" transform="rotate(-30 80 152)"/>
+            <path d="M 50 185 Q 40 220 45 260" stroke="currentColor" stroke-width="12" fill="none" stroke-linecap="round"/>
+            <rect x="200" y="145" width="40" height="15" rx="7" fill="currentColor" transform="rotate(30 220 152)"/>
+            <path d="M 250 185 Q 260 220 255 260" stroke="currentColor" stroke-width="12" fill="none" stroke-linecap="round"/>
+            <rect x="125" y="240" width="15" height="80" fill="currentColor"/>
+            <ellipse cx="132" cy="330" rx="12" ry="20" fill="currentColor"/>
+            <rect x="160" y="240" width="15" height="80" fill="currentColor"/>
+            <ellipse cx="167" cy="330" rx="12" ry="20" fill="currentColor"/>
+        </svg>
+        <div class="particles">
+            <div class="particle"></div>
+            <div class="particle"></div>
+            <div class="particle"></div>
+            <div class="particle"></div>
+            <div class="particle"></div>
+        </div>
+    </div>
+
+    <div id="content-area">
+        <!-- Dynamically populated -->
+    </div>
+
+    <script>
+        const BIRTHDAY_DATE = new Date('2026-08-30T15:00:00+08:00').getTime();
+        const urlParams = new URLSearchParams(window.location.search);
+        const isUnlocked = urlParams.get('unlocked') === 'true';
+        const now = new Date().getTime();
+        const isAfterBirthday = now >= BIRTHDAY_DATE;
+
+        if (!isUnlocked && !isAfterBirthday) {
+            // Not unlocked yet
+            document.getElementById('content-area').innerHTML = `
+                <div class="content">
+                    <div class="locked-message">
+                        <h2>🔒 Schedule Locked</h2>
+                        <p>The schedule will be revealed when the countdown reaches zero!</p>
+                        <p style="font-size: 0.9rem; color: var(--text-dim);">Come back on August 30 at 3:00 PM SGT</p>
+                        <a href="index.html" class="back-link">← Back to Countdown</a>
+                    </div>
+                </div>
+            `;
+        } else {
+            // Unlocked! Show the schedule
+            document.getElementById('content-area').innerHTML = `
+                <div class="schedule-container">
+                    <div class="schedule-header">
+                        <h1>🎉 MIKU.39 BIRTHDAY BASH 🎉</h1>
+                        <p>Hatsune Miku's 19th Birthday • August 30, 2026</p>
+                        <p style="font-size: 0.95rem; margin-top: 10px;">Organized by Xymiku.39</p>
+                    </div>
+
+                    <!-- Timeline/Schedule -->
+                    <div class="timeline">
+                        <h2 class="timeline-title">📅 Event Schedule</h2>
+                        <div class="timeline-item">
+                            <div class="timeline-time">3:00 PM</div>
+                            <div class="timeline-content">
+                                <h3>🎤 Opening Ceremony & Welcome</h3>
+                                <p>Kick off the celebration with a special welcome message and introduction to today's games.</p>
+                            </div>
+                        </div>
+                        <div class="timeline-item">
+                            <div class="timeline-time">3:30 PM</div>
+                            <div class="timeline-content">
+                                <h3>🎮 Games Begin</h3>
+                                <p>Multiple games running in parallel throughout the afternoon. Choose your challenges!</p>
+                            </div>
+                        </div>
+                        <div class="timeline-item">
+                            <div class="timeline-time">5:00 PM</div>
+                            <div class="timeline-content">
+                                <h3>🏆 Mid-Event Leaderboard Review</h3>
+                                <p>Check the standings and see who's leading in Mikudollars!</p>
+                            </div>
+                        </div>
+                        <div class="timeline-item">
+                            <div class="timeline-time">6:00 PM</div>
+                            <div class="timeline-content">
+                                <h3>🍰 Birthday Cake & Break</h3>
+                                <p>Time to celebrate with cake and refreshments before the final games.</p>
+                            </div>
+                        </div>
+                        <div class="timeline-item">
+                            <div class="timeline-time">6:30 PM</div>
+                            <div class="timeline-content">
+                                <h3>🎯 Final Round Games</h3>
+                                <p>Last chance to earn those crucial Mikudollars!</p>
+                            </div>
+                        </div>
+                        <div class="timeline-item">
+                            <div class="timeline-time">8:00 PM</div>
+                            <div class="timeline-content">
+                                <h3>🏅 Awards Ceremony & Closing</h3>
+                                <p>Announce the Mikudollars champions and wrap up the celebration.</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Games Section -->
+                    <div class="games-section">
+                        <h2 class="section-title">🎮 Featured Games</h2>
+                        <div class="games-grid">
+                            <a href="#" class="game-card" onclick="alert('Game link would go here - configure in admin dashboard')">
+                                <div class="game-icon">🎯</div>
+                                <div class="game-title">Quiz Master</div>
+                                <div class="game-description">Test your Miku knowledge with our trivia challenge!</div>
+                                <div class="game-link-btn">Join Game</div>
+                            </a>
+                            <a href="#" class="game-card" onclick="alert('Game link would go here - configure in admin dashboard')">
+                                <div class="game-icon">🎵</div>
+                                <div class="game-title">Rhythm Challenge</div>
+                                <div class="game-description">Tap to the beat and earn Mikudollars!</div>
+                                <div class="game-link-btn">Join Game</div>
+                            </a>
+                            <a href="#" class="game-card" onclick="alert('Game link would go here - configure in admin dashboard')">
+                                <div class="game-icon">🎨</div>
+                                <div class="game-title">Creative Contest</div>
+                                <div class="game-description">Show off your artistic talents and vote on entries.</div>
+                                <div class="game-link-btn">Join Game</div>
+                            </a>
+                            <a href="#" class="game-card" onclick="alert('Game link would go here - configure in admin dashboard')">
+                                <div class="game-icon">⚡</div>
+                                <div class="game-title">Speed Race</div>
+                                <div class="game-description">Fast reflexes = big Mikudollars rewards!</div>
+                                <div class="game-link-btn">Join Game</div>
+                            </a>
+                        </div>
+                    </div>
+
+                    <!-- Leaderboards Section -->
+                    <div class="leaderboard-section">
+                        <h2 class="section-title">💰 Mikudollars Leaderboard</h2>
+                        <div class="leaderboard-container">
+                            <div class="leaderboard" id="overall-leaderboard">
+                                <div class="leaderboard-title">🏆 Overall Rankings</div>
+                                <ul class="leaderboard-list">
+                                    <li class="leaderboard-item">
+                                        <div class="rank gold">🥇</div>
+                                        <div class="player-name">[Player Name]</div>
+                                        <div class="player-score">0</div>
+                                    </li>
+                                    <li class="leaderboard-item">
+                                        <div class="rank silver">🥈</div>
+                                        <div class="player-name">[Player Name]</div>
+                                        <div class="player-score">0</div>
+                                    </li>
+                                    <li class="leaderboard-item">
+                                        <div class="rank bronze">🥉</div>
+                                        <div class="player-name">[Player Name]</div>
+                                        <div class="player-score">0</div>
+                                    </li>
+                                    <li class="leaderboard-item">
+                                        <div class="rank">4</div>
+                                        <div class="player-name">[Player Name]</div>
+                                        <div class="player-score">0</div>
+                                    </li>
+                                    <li class="leaderboard-item">
+                                        <div class="rank">5</div>
+                                        <div class="player-name">[Player Name]</div>
+                                        <div class="player-score">0</div>
+                                    </li>
+                                </ul>
+                                <div class="admin-note">📊 Real-time leaderboard updates from admin dashboard</div>
+                            </div>
+
+                            <div class="leaderboard">
+                                <div class="leaderboard-title">🎮 Quiz Master Scores</div>
+                                <ul class="leaderboard-list">
+                                    <li class="leaderboard-item">
+                                        <div class="rank gold">🥇</div>
+                                        <div class="player-name">[Player Name]</div>
+                                        <div class="player-score">0</div>
+                                    </li>
+                                    <li class="leaderboard-item">
+                                        <div class="rank silver">🥈</div>
+                                        <div class="player-name">[Player Name]</div>
+                                        <div class="player-score">0</div>
+                                    </li>
+                                    <li class="leaderboard-item">
+                                        <div class="rank bronze">🥉</div>
+                                        <div class="player-name">[Player Name]</div>
+                                        <div class="player-score">0</div>
+                                    </li>
+                                    <li class="leaderboard-item">
+                                        <div class="rank">4</div>
+                                        <div class="player-name">[Player Name]</div>
+                                        <div class="player-score">0</div>
+                                    </li>
+                                    <li class="leaderboard-item">
+                                        <div class="rank">5</div>
+                                        <div class="player-name">[Player Name]</div>
+                                        <div class="player-score">0</div>
+                                    </li>
+                                </ul>
+                                <div class="admin-note">📊 Scores updated throughout the event</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="schedule-footer">
+                        <p>🎂 Happy 19th Birthday, Miku! 🎂</p>
+                        <p style="margin-top: 15px; font-size: 0.9rem;">
+                            <a href="index.html">← Back to Main</a> • 
+                            <a href="admin.html">📊 Admin Dashboard</a>
+                        </p>
+                    </div>
+                </div>
+            `;
+        }
+    </script>
+</body>
+</html>

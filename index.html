@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MIKU.39 — Countdown to 19th Birthday</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="background">
+        <!-- Animated grid background -->
+        <div class="grid-background"></div>
+        
+        <!-- Miku silhouette -->
+        <svg class="miku-silhouette" viewBox="0 0 300 600" xmlns="http://www.w3.org/2000/svg">
+            <!-- Head -->
+            <circle cx="150" cy="80" r="35" fill="currentColor"/>
+            <!-- Pigtails (twin tails) -->
+            <ellipse cx="80" cy="60" rx="25" ry="45" fill="currentColor"/>
+            <ellipse cx="220" cy="60" rx="25" ry="45" fill="currentColor"/>
+            <!-- Neck -->
+            <rect x="140" y="110" width="20" height="20" fill="currentColor"/>
+            <!-- Torso -->
+            <path d="M 120 130 L 100 220 L 110 240 L 140 240 L 140 160 L 160 160 L 160 240 L 190 240 L 200 220 L 180 130 Z" fill="currentColor"/>
+            <!-- Left arm -->
+            <rect x="60" y="145" width="40" height="15" rx="7" fill="currentColor" transform="rotate(-30 80 152)"/>
+            <path d="M 50 185 Q 40 220 45 260" stroke="currentColor" stroke-width="12" fill="none" stroke-linecap="round"/>
+            <!-- Right arm -->
+            <rect x="200" y="145" width="40" height="15" rx="7" fill="currentColor" transform="rotate(30 220 152)"/>
+            <path d="M 250 185 Q 260 220 255 260" stroke="currentColor" stroke-width="12" fill="none" stroke-linecap="round"/>
+            <!-- Left leg -->
+            <rect x="125" y="240" width="15" height="80" fill="currentColor"/>
+            <ellipse cx="132" cy="330" rx="12" ry="20" fill="currentColor"/>
+            <!-- Right leg -->
+            <rect x="160" y="240" width="15" height="80" fill="currentColor"/>
+            <ellipse cx="167" cy="330" rx="12" ry="20" fill="currentColor"/>
+        </svg>
+
+        <!-- Floating particles -->
+        <div class="particles">
+            <div class="particle"></div>
+            <div class="particle"></div>
+            <div class="particle"></div>
+            <div class="particle"></div>
+            <div class="particle"></div>
+        </div>
+    </div>
+
+    <div class="content">
+        <div class="header">
+            <h1 class="title glitch" data-text="MIKU.39">MIKU.39</h1>
+            <p class="subtitle">Hatsune Miku's 19th Birthday Celebration</p>
+        </div>
+
+        <div class="countdown-container">
+            <div class="countdown" id="countdown">
+                <div class="time-unit">
+                    <span class="time-value" id="days">00</span>
+                    <span class="time-label">Days</span>
+                </div>
+                <div class="time-unit">
+                    <span class="time-value" id="hours">00</span>
+                    <span class="time-label">Hours</span>
+                </div>
+                <div class="time-unit">
+                    <span class="time-value" id="minutes">00</span>
+                    <span class="time-label">Minutes</span>
+                </div>
+                <div class="time-unit">
+                    <span class="time-value" id="seconds">00</span>
+                    <span class="time-label">Seconds</span>
+                </div>
+            </div>
+
+            <div class="event-info">
+                <p class="event-date">📅 August 30, 2026 · 3:00 PM SGT</p>
+                <p class="event-text">Join us for an unforgettable celebration</p>
+            </div>
+        </div>
+
+        <div class="footer-text">
+            <p>🎂 19 Years of Miku 🎂</p>
+            <p style="font-size: 0.9rem; opacity: 0.7;">Organized by Xymiku.39</p>
+        </div>
+    </div>
+
+    <!-- Easter egg link to schedule (barely visible) -->
+    <a href="schedule.html" class="secret-link">schedule</a>
+
+    <script src="script.js"></script>
+</body>
+</html>
