@@ -43,98 +43,126 @@
     <div class="signal-line" aria-hidden="true"></div>
 
     <header class="topbar">
-        <span class="topbar-id">MIKU-19 // SYNTHESIS PROTOCOL</span>
-        <div class="topbar-status">
-            <span class="status-item"><span class="dot"></span>SYSTEM STATUS: <b>ONLINE</b></span>
-            <span class="status-item"><span class="dot"></span>VOCAL SYNTHESIS: <b>ACTIVE</b></span>
-            <span class="status-item status-item--signal">SIGNAL: <b>39</b></span>
+        <div class="topbar-left">
+            <span class="topbar-id">MIKU-19 <span class="dim">//</span> SYNTHESIS PROTOCOL</span>
+        </div>
+        <div class="topbar-mid">
+            <span class="status-pill"><span class="dot"></span>SYSTEM STATUS: <b>ONLINE</b></span>
+            <span class="status-pill"><span class="dot"></span>VOCAL SYNTHESIS: <b>ACTIVE</b></span>
+            <span class="status-pill status-pill--accent">SIGNAL: <b>39</b></span>
+            <span class="topbar-icon" aria-hidden="true">⠿</span>
+        </div>
+        <div class="topbar-right">
+            <svg class="topbar-wave" viewBox="0 0 160 24" preserveAspectRatio="none" aria-hidden="true">
+                <polyline points="0,12 8,12 12,4 16,20 20,8 24,16 28,12 40,12 44,6 48,18 52,12 64,12 68,3 72,21 76,12 90,12 94,9 98,15 102,12 120,12 124,5 128,19 132,12 160,12" />
+            </svg>
+            <span class="status-pill status-pill--accent">CHANNEL <b>39</b></span>
+            <span class="hazard-stripe" aria-hidden="true"></span>
         </div>
     </header>
 
     <main class="content">
         <div class="hero">
-            <h1 class="title glitch" data-text="MIKU-19">MIKU-19</h1>
-            <p class="subtitle">Hatsune Miku's 19th Birthday Celebration</p>
+            <div class="title-row">
+                <span class="hero-tick" aria-hidden="true">01›</span>
+                <h1 class="title glitch" data-text="MIKU-19">MIKU-19</h1>
+                <span class="hero-tick" aria-hidden="true">‹10</span>
+            </div>
+            <p class="subtitle">[ Hatsune Miku's 19th Birthday Celebration ]</p>
         </div>
 
         <div class="control-room">
             <aside class="synth-panel synth-panel--left" aria-hidden="true">
-                <div class="panel-label">MODULAR SYNTH <span class="dim">· SEQ 0039</span></div>
+                <div class="panel-label"><span class="panel-icon">▤</span>SYNTH MODULE 01<span class="panel-menu">⋮⋮</span></div>
 
                 <div class="synth-module">
-                    <div class="module-row">
-                        <span class="module-name">OSC 01</span>
-                        <span class="module-val" id="osc01-val">62%</span>
+                    <div class="module-title-row"><span class="module-name">OSC 01</span></div>
+                    <span class="module-sub">WAVEFORM</span>
+                    <svg class="wave-icon" viewBox="0 0 100 24" preserveAspectRatio="none"><path d="M0,12 Q12.5,0 25,12 T50,12 T75,12 T100,12" /></svg>
+                    <div class="knob-row">
+                        <div class="knob-block"><div class="knob" style="--rot:-40deg"></div><span class="knob-label">TUNE</span></div>
+                        <div class="knob-block"><div class="knob" style="--rot:20deg"></div><span class="knob-label">DETUNE</span></div>
+                        <div class="vfader-block"><div class="vfader"><div class="vfader-fill" style="height:70%"></div></div><span class="knob-label">LEVEL</span></div>
                     </div>
-                    <div class="slider"><div class="slider-fill" id="osc01-fill" style="width:62%"></div></div>
                 </div>
 
                 <div class="synth-module">
-                    <div class="module-row">
-                        <span class="module-name">OSC 02</span>
-                        <span class="module-val" id="osc02-val">44%</span>
+                    <div class="module-title-row"><span class="module-name">OSC 02</span></div>
+                    <span class="module-sub">WAVEFORM</span>
+                    <svg class="wave-icon" viewBox="0 0 100 24" preserveAspectRatio="none"><polyline points="0,20 12,4 25,20 37,4 50,20 62,4 75,20 87,4 100,20" /></svg>
+                    <div class="knob-row">
+                        <div class="knob-block"><div class="knob" style="--rot:60deg"></div><span class="knob-label">TUNE</span></div>
+                        <div class="knob-block"><div class="knob" style="--rot:-15deg"></div><span class="knob-label">DETUNE</span></div>
+                        <div class="vfader-block"><div class="vfader"><div class="vfader-fill slider-fill--alt" style="height:44%"></div></div><span class="knob-label">LEVEL</span></div>
                     </div>
-                    <div class="slider"><div class="slider-fill slider-fill--alt" id="osc02-fill" style="width:44%"></div></div>
                 </div>
 
                 <div class="synth-module">
-                    <div class="module-row">
-                        <span class="module-name">FILTER</span>
-                        <span class="module-val" id="filter-val">78%</span>
+                    <div class="module-title-row"><span class="module-name">FILTER</span><span class="filter-type">LOW PASS 24</span></div>
+                    <span class="module-sub">FREQUENCY</span>
+                    <svg class="wave-icon" viewBox="0 0 100 24" preserveAspectRatio="none"><path d="M0,6 H55 Q70,6 78,20 H100" /></svg>
+                    <div class="knob-row">
+                        <div class="knob-block"><div class="knob" style="--rot:10deg"></div><span class="knob-label">CUTOFF</span></div>
+                        <div class="knob-block"><div class="knob" style="--rot:-55deg"></div><span class="knob-label">RES</span></div>
+                        <div class="vfader-block"><div class="vfader"><div class="vfader-fill" style="height:78%"></div></div><span class="knob-label">ENV</span></div>
                     </div>
-                    <div class="slider"><div class="slider-fill" id="filter-fill" style="width:78%"></div></div>
                 </div>
 
-                <div class="synth-module">
-                    <div class="module-row">
-                        <span class="module-name">LFO</span>
-                        <span class="module-val" id="lfo-val">31%</span>
+                <div class="synth-module synth-module--last">
+                    <div class="module-title-row"><span class="module-name">LFO</span></div>
+                    <span class="module-sub">WAVEFORM</span>
+                    <svg class="wave-icon" viewBox="0 0 100 24" preserveAspectRatio="none"><polyline points="0,20 20,20 20,4 40,4 40,20 60,20 60,4 80,4 80,20 100,20" /></svg>
+                    <div class="knob-row">
+                        <div class="knob-block"><div class="knob" style="--rot:30deg"></div><span class="knob-label">RATE</span></div>
+                        <div class="knob-block"><div class="knob" style="--rot:-25deg"></div><span class="knob-label">DEPTH</span></div>
+                        <div class="vfader-block"><div class="vfader"><div class="vfader-fill slider-fill--alt" style="height:31%"></div></div><span class="knob-label">FADE</span></div>
                     </div>
-                    <div class="slider"><div class="slider-fill slider-fill--alt" id="lfo-fill" style="width:31%"></div></div>
                 </div>
-
-                <svg class="waveform-icon" viewBox="0 0 200 40" preserveAspectRatio="none">
-                    <path d="M0,20 Q10,2 20,20 T40,20 T60,20 T80,20 T100,20 T120,20 T140,20 T160,20 T180,20 T200,20" fill="none" />
-                </svg>
             </aside>
 
             <section class="countdown-panel">
+                <div class="ruler" aria-hidden="true"></div>
                 <div class="panel-header">
                     <span>OPERATION: MIKU-19</span>
-                    <span class="calibration">CH.39</span>
+                    <span class="calibration">PROTOCOL ID 39-3901-2026</span>
                 </div>
 
                 <div class="countdown" id="countdown">
                     <div class="time-unit">
-                        <span class="time-value" id="days">00</span>
+                        <div class="digit-group" data-unit="days"></div>
                         <span class="time-label">Days</span>
                     </div>
                     <div class="colon" aria-hidden="true">:</div>
                     <div class="time-unit">
-                        <span class="time-value" id="hours">00</span>
-                        <span class="time-label">Hrs</span>
+                        <div class="digit-group" data-unit="hours"></div>
+                        <span class="time-label">Hours</span>
                     </div>
                     <div class="colon" aria-hidden="true">:</div>
                     <div class="time-unit">
-                        <span class="time-value" id="minutes">00</span>
+                        <div class="digit-group" data-unit="minutes"></div>
                         <span class="time-label">Min</span>
                     </div>
                     <div class="colon" aria-hidden="true">:</div>
                     <div class="time-unit">
-                        <span class="time-value" id="seconds">00</span>
+                        <div class="digit-group" data-unit="seconds"></div>
                         <span class="time-label">Sec</span>
                     </div>
                 </div>
 
                 <div class="panel-footer-row">
-                    <span class="footer-stat">SYNC <b id="sync-val">98%</b></span>
+                    <span class="footer-stat">SYNC <b id="sync-val">98%</b><span class="mini-bar"><span class="mini-bar-fill" id="sync-bar" style="width:98%"></span></span></span>
                     <span class="footer-stat">SIGNAL <b>39</b></span>
-                    <span class="footer-stat footer-stat--live"><span class="live-dot"></span>LIVE</span>
+                    <span class="footer-stat footer-stat--live"><span class="live-dot"></span>BROADCAST: LIVE</span>
                 </div>
             </section>
 
             <aside class="synth-panel synth-panel--right" aria-hidden="true">
-                <div class="panel-label">VOCAL SYNTHESIS <span class="dim">· CH.39</span></div>
+                <div class="panel-label"><span class="panel-icon">♪</span>VOCAL SYNTHESIS<span class="panel-menu">⋮⋮</span></div>
+
+                <div class="visualizer-meta visualizer-meta--top">
+                    <span>CHANNEL <b>39</b></span>
+                    <span>VOICE: <b>MIKU</b></span>
+                </div>
 
                 <div class="eq-bars">
                     <span></span><span></span><span></span><span></span><span></span>
@@ -143,33 +171,79 @@
                     <span></span>
                 </div>
 
-                <div class="visualizer-meta">
-                    <span>VOICE: MIKU</span>
-                    <span>SIGNAL ACTIVE</span>
+                <span class="module-sub">FREQUENCY ANALYSIS</span>
+                <svg class="freq-line" viewBox="0 0 200 36" preserveAspectRatio="none">
+                    <polyline points="0,18 8,10 16,24 24,14 32,20 40,6 48,22 56,16 64,26 72,12 80,18 88,8 96,22 104,16 112,10 120,24 128,14 136,20 144,8 152,22 160,16 168,12 176,20 184,10 192,18 200,14" />
+                </svg>
+
+                <span class="module-sub">HARMONICS</span>
+                <div class="harmonics-bars">
+                    <span></span><span></span><span></span><span></span><span></span>
+                    <span></span><span></span><span></span><span></span><span></span>
+                    <span></span><span></span><span></span><span></span><span></span>
+                    <span></span><span></span><span></span><span></span><span></span>
+                </div>
+                <div class="harmonics-scale">
+                    <span>01</span><span>10</span><span>20</span><span>30</span><span class="harmonics-scale--hi">39</span>
+                </div>
+
+                <div class="parameters">
+                    <div class="param-row"><span>TONE</span><span class="param-val">+0.39</span></div>
+                    <div class="param-row"><span>BRIGHTNESS</span><span class="param-val">+0.39</span></div>
+                    <div class="param-row"><span>CLEARNESS</span><span class="param-val">+0.39</span></div>
+                    <div class="param-row"><span>GENDER FACTOR</span><span class="param-val">39</span></div>
                 </div>
             </aside>
         </div>
 
-        <div class="event-panel">
-            <div class="event-panel-header">EVENT INITIALIZATION</div>
-            <div class="event-row">
-                <span class="event-key">DATE</span>
-                <span class="event-val">30 AUG 2026</span>
+        <div class="status-strip">
+            <div class="status-panel status-panel--vitals" aria-hidden="true">
+                <div class="panel-label">SYSTEM VITALS</div>
+                <div class="vitals-row"><span>POWER</span><span class="vitals-val vitals-val--ok">STABLE</span></div>
+                <div class="vitals-row"><span>TEMP</span><span class="vitals-val">39.0°C</span></div>
+                <div class="vitals-row"><span>CPU</span><span class="vitals-val">28%</span></div>
+                <div class="vitals-row"><span>MEM</span><span class="vitals-val">3.9 / 15.9GB</span></div>
+                <div class="radar" aria-hidden="true"><span class="radar-sweep"></span></div>
             </div>
-            <div class="event-row">
-                <span class="event-key">TIME</span>
-                <span class="event-val">15:00 SGT</span>
+
+            <div class="event-panel">
+                <div class="event-panel-header">EVENT INITIALIZATION</div>
+                <div class="event-row">
+                    <span class="event-key">Date</span>
+                    <span class="event-val">30 Aug 2026</span>
+                </div>
+                <div class="event-row">
+                    <span class="event-key">Time</span>
+                    <span class="event-val">15:00 SGT</span>
+                </div>
+                <div class="event-row">
+                    <span class="event-key">Event</span>
+                    <span class="event-val">MIKU-19</span>
+                </div>
+                <div class="event-row">
+                    <span class="event-key">Status</span>
+                    <span class="event-val event-val--accent">Awaiting Initialization</span>
+                </div>
             </div>
-            <div class="event-row">
-                <span class="event-key">EVENT</span>
-                <span class="event-val">MIKU-19</span>
+
+            <div class="status-panel status-panel--activation" aria-hidden="true">
+                <div class="panel-label">ACTIVATION SEQUENCE</div>
+                <div class="vitals-row"><span>PROGRESS</span><span class="vitals-val" id="activation-val">39%</span></div>
+                <div class="mini-bar mini-bar--wide"><span class="mini-bar-fill" id="activation-bar" style="width:39%"></span></div>
+                <div class="vitals-row"><span>SEQUENCE</span><span class="vitals-val">0039</span></div>
+                <div class="vitals-row"><span>STATUS</span><span class="vitals-val vitals-val--accent">STANDBY&hellip;</span></div>
             </div>
         </div>
 
         <footer class="footer-text">
-            <p class="footer-main">◉ 19 YEARS OF MIKU</p>
-            <p class="footer-sub">SYNTHESIS COMPLETE // 2007 → 2026</p>
-            <p class="footer-credit">ORGANIZED BY XYMIKU.39</p>
+            <p class="footer-main">◉ 19 Years of Miku ◉</p>
+            <p class="footer-sub">Synthesis Complete // 2007 <span class="arrow">→</span> 2026</p>
+            <div class="footer-credit-row">
+                <svg class="ecg" viewBox="0 0 120 24" preserveAspectRatio="none" aria-hidden="true"><polyline points="0,12 20,12 26,4 32,20 38,12 60,12 66,4 72,20 78,12 120,12" /></svg>
+                <p class="footer-credit">Organized by Xymiku.39</p>
+                <svg class="ecg" viewBox="0 0 120 24" preserveAspectRatio="none" aria-hidden="true"><polyline points="0,12 20,12 26,4 32,20 38,12 60,12 66,4 72,20 78,12 120,12" /></svg>
+            </div>
+            <p class="copyright">&copy; 2026 MIKU-19 Project</p>
         </footer>
     </main>
 
