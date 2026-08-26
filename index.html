@@ -3,61 +3,175 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>MIKU-19 — Countdown to 19th Birthday</title>
+    <title>MIKU-19 // SYNTHESIS PROTOCOL — Countdown</title>
+    <meta name="description" content="MIKU-19 // SYNTHESIS PROTOCOL — countdown to Hatsune Miku's 19th birthday celebration.">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@600;800&family=Share+Tech+Mono&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
-    <div class="background">
-        <!-- Animated grid background -->
-        <div class="grid-background"></div>
-        
-        <!-- Floating particles -->
+    <div class="background" aria-hidden="true">
+        <div class="grid-bg grid-bg--large"></div>
+        <div class="grid-bg grid-bg--small"></div>
+
+        <svg class="circuit-traces" viewBox="0 0 1000 1000" preserveAspectRatio="none">
+            <path d="M0,120 H180 V260 H420 V90 H1000" fill="none" />
+            <path d="M0,780 H140 V620 H360 V860 H1000" fill="none" />
+            <path d="M120,0 V180 H60 V1000" fill="none" />
+            <path d="M880,0 V240 H960 V1000" fill="none" />
+            <circle cx="180" cy="260" r="4" />
+            <circle cx="420" cy="90" r="4" />
+            <circle cx="140" cy="620" r="4" />
+            <circle cx="360" cy="860" r="4" />
+        </svg>
+
+        <div class="perspective-floor"></div>
+
         <div class="particles">
             <div class="particle"></div>
             <div class="particle"></div>
             <div class="particle"></div>
             <div class="particle"></div>
             <div class="particle"></div>
+            <div class="particle"></div>
         </div>
+
+        <div class="scanlines"></div>
     </div>
 
-    <div class="content">
-        <div class="header">
+    <div class="signal-line" aria-hidden="true"></div>
+
+    <header class="topbar">
+        <span class="topbar-id">MIKU-19 // SYNTHESIS PROTOCOL</span>
+        <div class="topbar-status">
+            <span class="status-item"><span class="dot"></span>SYSTEM STATUS: <b>ONLINE</b></span>
+            <span class="status-item"><span class="dot"></span>VOCAL SYNTHESIS: <b>ACTIVE</b></span>
+            <span class="status-item status-item--signal">SIGNAL: <b>39</b></span>
+        </div>
+    </header>
+
+    <main class="content">
+        <div class="hero">
             <h1 class="title glitch" data-text="MIKU-19">MIKU-19</h1>
             <p class="subtitle">Hatsune Miku's 19th Birthday Celebration</p>
         </div>
 
-        <div class="countdown-container">
-            <div class="countdown" id="countdown">
-                <div class="time-unit">
-                    <span class="time-value" id="days">00</span>
-                    <span class="time-label">Days</span>
-                </div>
-                <div class="time-unit">
-                    <span class="time-value" id="hours">00</span>
-                    <span class="time-label">Hours</span>
-                </div>
-                <div class="time-unit">
-                    <span class="time-value" id="minutes">00</span>
-                    <span class="time-label">Minutes</span>
-                </div>
-                <div class="time-unit">
-                    <span class="time-value" id="seconds">00</span>
-                    <span class="time-label">Seconds</span>
-                </div>
-            </div>
+        <div class="control-room">
+            <aside class="synth-panel synth-panel--left" aria-hidden="true">
+                <div class="panel-label">MODULAR SYNTH <span class="dim">· SEQ 0039</span></div>
 
-            <div class="event-info">
-                <p class="event-date">📅 August 30, 2026 · 3:00 PM SGT</p>
-                <p class="event-text">Join us for an unforgettable celebration</p>
+                <div class="synth-module">
+                    <div class="module-row">
+                        <span class="module-name">OSC 01</span>
+                        <span class="module-val" id="osc01-val">62%</span>
+                    </div>
+                    <div class="slider"><div class="slider-fill" id="osc01-fill" style="width:62%"></div></div>
+                </div>
+
+                <div class="synth-module">
+                    <div class="module-row">
+                        <span class="module-name">OSC 02</span>
+                        <span class="module-val" id="osc02-val">44%</span>
+                    </div>
+                    <div class="slider"><div class="slider-fill slider-fill--alt" id="osc02-fill" style="width:44%"></div></div>
+                </div>
+
+                <div class="synth-module">
+                    <div class="module-row">
+                        <span class="module-name">FILTER</span>
+                        <span class="module-val" id="filter-val">78%</span>
+                    </div>
+                    <div class="slider"><div class="slider-fill" id="filter-fill" style="width:78%"></div></div>
+                </div>
+
+                <div class="synth-module">
+                    <div class="module-row">
+                        <span class="module-name">LFO</span>
+                        <span class="module-val" id="lfo-val">31%</span>
+                    </div>
+                    <div class="slider"><div class="slider-fill slider-fill--alt" id="lfo-fill" style="width:31%"></div></div>
+                </div>
+
+                <svg class="waveform-icon" viewBox="0 0 200 40" preserveAspectRatio="none">
+                    <path d="M0,20 Q10,2 20,20 T40,20 T60,20 T80,20 T100,20 T120,20 T140,20 T160,20 T180,20 T200,20" fill="none" />
+                </svg>
+            </aside>
+
+            <section class="countdown-panel">
+                <div class="panel-header">
+                    <span>OPERATION: MIKU-19</span>
+                    <span class="calibration">CH.39</span>
+                </div>
+
+                <div class="countdown" id="countdown">
+                    <div class="time-unit">
+                        <span class="time-value" id="days">00</span>
+                        <span class="time-label">Days</span>
+                    </div>
+                    <div class="colon" aria-hidden="true">:</div>
+                    <div class="time-unit">
+                        <span class="time-value" id="hours">00</span>
+                        <span class="time-label">Hrs</span>
+                    </div>
+                    <div class="colon" aria-hidden="true">:</div>
+                    <div class="time-unit">
+                        <span class="time-value" id="minutes">00</span>
+                        <span class="time-label">Min</span>
+                    </div>
+                    <div class="colon" aria-hidden="true">:</div>
+                    <div class="time-unit">
+                        <span class="time-value" id="seconds">00</span>
+                        <span class="time-label">Sec</span>
+                    </div>
+                </div>
+
+                <div class="panel-footer-row">
+                    <span class="footer-stat">SYNC <b id="sync-val">98%</b></span>
+                    <span class="footer-stat">SIGNAL <b>39</b></span>
+                    <span class="footer-stat footer-stat--live"><span class="live-dot"></span>LIVE</span>
+                </div>
+            </section>
+
+            <aside class="synth-panel synth-panel--right" aria-hidden="true">
+                <div class="panel-label">VOCAL SYNTHESIS <span class="dim">· CH.39</span></div>
+
+                <div class="eq-bars">
+                    <span></span><span></span><span></span><span></span><span></span>
+                    <span></span><span></span><span></span><span></span><span></span>
+                    <span></span><span></span><span></span><span></span><span></span>
+                    <span></span>
+                </div>
+
+                <div class="visualizer-meta">
+                    <span>VOICE: MIKU</span>
+                    <span>SIGNAL ACTIVE</span>
+                </div>
+            </aside>
+        </div>
+
+        <div class="event-panel">
+            <div class="event-panel-header">EVENT INITIALIZATION</div>
+            <div class="event-row">
+                <span class="event-key">DATE</span>
+                <span class="event-val">30 AUG 2026</span>
+            </div>
+            <div class="event-row">
+                <span class="event-key">TIME</span>
+                <span class="event-val">15:00 SGT</span>
+            </div>
+            <div class="event-row">
+                <span class="event-key">EVENT</span>
+                <span class="event-val">MIKU-19</span>
             </div>
         </div>
 
-        <div class="footer-text">
-            <p>🎂 19 Years of Miku 🎂</p>
-            <p style="font-size: 0.9rem; opacity: 0.7;">Organized by Xymiku.39</p>
-        </div>
-    </div>
+        <footer class="footer-text">
+            <p class="footer-main">◉ 19 YEARS OF MIKU</p>
+            <p class="footer-sub">SYNTHESIS COMPLETE // 2007 → 2026</p>
+            <p class="footer-credit">ORGANIZED BY XYMIKU.39</p>
+        </footer>
+    </main>
 
     <!-- Easter egg link to schedule (barely visible) -->
     <a href="schedule.html" class="secret-link">schedule</a>
