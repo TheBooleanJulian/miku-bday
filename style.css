@@ -59,29 +59,6 @@ body {
     }
 }
 
-/* Miku Silhouette */
-.miku-silhouette {
-    position: absolute;
-    right: -100px;
-    bottom: 0;
-    width: 400px;
-    height: 600px;
-    color: rgba(0, 212, 255, 0.15);
-    filter: drop-shadow(0 0 30px rgba(255, 0, 110, 0.3));
-    animation: miku-float 6s ease-in-out infinite;
-    z-index: 0;
-    opacity: 0.8;
-}
-
-@keyframes miku-float {
-    0%, 100% {
-        transform: translateY(0px) rotate(0deg);
-    }
-    50% {
-        transform: translateY(-20px) rotate(1deg);
-    }
-}
-
 /* Particles */
 .particles {
     position: absolute;
@@ -406,12 +383,6 @@ body {
         font-size: 2rem;
     }
 
-    .miku-silhouette {
-        right: -150px;
-        width: 350px;
-        opacity: 0.5;
-    }
-
     .content {
         padding: 15px;
     }
@@ -443,7 +414,4 @@ body {
         font-size: 1rem;
     }
 
-    .miku-silhouette {
-        display: none;
-    }
 }
