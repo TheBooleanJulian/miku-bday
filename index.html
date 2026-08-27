@@ -45,6 +45,30 @@
             overflow: hidden;
         }
 
+        .bg-texture {
+            position: absolute;
+            inset: 0;
+            background-image: url('assets/grid-texture-tile.jpg');
+            background-repeat: repeat;
+            background-size: 900px 700px;
+            background-position: 0 0;
+            opacity: 0.3;
+            mix-blend-mode: screen;
+            animation: textureScroll 70s linear infinite;
+        }
+
+        .bg-texture::before {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background: radial-gradient(ellipse at center, transparent 0%, var(--bg-dark) 80%);
+        }
+
+        @keyframes textureScroll {
+            from { background-position: 0 0; }
+            to { background-position: -900px -700px; }
+        }
+
         .bg-grid {
             position: absolute;
             width: 200%;
@@ -853,6 +877,7 @@
 <body>
     <!-- Background -->
     <div class="bg-container">
+        <div class="bg-texture"></div>
         <div class="bg-grid"></div>
         <div class="bg-particles" id="particles"></div>
         <img src="assets/miku-silhouette.png" alt="" class="miku-silhouette">
