@@ -6,11 +6,11 @@ A sci-fi futuristic countdown landing page for Hatsune Miku's 19th birthday cele
 
 ```
 miku-bday/
-├── index.html          # Main countdown landing page
+├── index.html          # Main countdown landing page (self-contained: inline CSS/JS)
 ├── schedule.html       # Hidden schedule/leaderboard (auto-unlocks at event time)
 ├── admin.html          # Admin dashboard for managing games & scores
-├── style.css           # Shared styling (sci-fi neon theme)
-├── script.js           # Countdown logic
+├── style.css           # Shared styling for schedule.html & admin.html
+├── script.js           # Legacy countdown logic (not used by index.html)
 └── README.md           # This file
 ```
 
@@ -18,9 +18,9 @@ miku-bday/
 
 ### Landing Page (`index.html`)
 - **Sci-Fi Countdown**: Real-time countdown timer to August 30, 2026 at 3:00 PM SGT
-- **Miku Silhouette**: Animated Hatsune Miku silhouette in the background
+- **Angular Accent Shapes**: Animated cyan/magenta clip-path shards in the background and signature badge (no character imagery)
 - **Neon Aesthetics**: Cyan/magenta color scheme with glitch effects and animations
-- **Responsive Design**: Works on desktop, tablet, and mobile
+- **Mobile-First**: On phones, the title and countdown are reordered to the top so they're visible without scrolling; desktop keeps the full multi-panel dashboard
 - **Easter Egg**: Barely visible link to schedule.html (for testing/debugging)
 
 ### Schedule Page (`schedule.html`)
@@ -98,16 +98,15 @@ npx http-server
 
 ### Testing
 - **Test schedule page**: Visit `schedule.html?unlocked=true` at any time
-- **Test unlock**: Change the BIRTHDAY_DATE in `script.js` to a past time
+- **Test unlock**: Change the `BIRTHDAY_DATE` in `schedule.html` to a past time
 - **Test responsiveness**: Use browser dev tools to test mobile view
 
 ## ⚙️ Configuration
 
 ### Change Event Time
-Edit the event date in `script.js`:
-```javascript
-const BIRTHDAY_DATE = new Date('2026-08-30T15:00:00+08:00').getTime();
-```
+Each page keeps its own inline countdown target — update all of them together:
+- `index.html`: `const target = new Date('2026-08-30T15:00:00+08:00');`
+- `schedule.html`: `const BIRTHDAY_DATE = new Date('2026-08-30T15:00:00+08:00').getTime();`
 
 Format: `YYYY-MM-DDTHH:MM:SS+TZ:TZ`
 
@@ -139,7 +138,7 @@ Game cards in `schedule.html` can be customized or duplicated (around line 230-2
 
 ## 🎨 Customization Ideas
 
-1. **Change Miku silhouette**: Modify the SVG in HTML files
+1. **Change the accent shapes**: Adjust the `.angular-deco .shard` clip-paths in `index.html` for different background silhouettes
 2. **Add more games**: Duplicate game cards and update links
 3. **Multiple leaderboards**: Add new leaderboard divs in schedule.html
 4. **Custom fonts**: Import Google Fonts or use system fonts
