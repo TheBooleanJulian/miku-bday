@@ -1351,7 +1351,7 @@
                             <span class="knob-label">DETUNE</span>
                         </div>
                         <div class="knob-group">
-                            <div class="knob"></div>
+                            <div class="knob" id="knob-osc1-level"></div>
                             <span class="knob-label">LEVEL</span>
                         </div>
                     </div>
@@ -1406,11 +1406,11 @@
                             <span class="knob-label">CUTOFF</span>
                         </div>
                         <div class="knob-group">
-                            <div class="knob" id="knob-filter-res"></div>
+                            <div class="knob"></div>
                             <span class="knob-label">RES</span>
                         </div>
                         <div class="knob-group">
-                            <div class="knob" id="knob-filter-env"></div>
+                            <div class="knob"></div>
                             <span class="knob-label">ENV</span>
                         </div>
                     </div>
@@ -1430,7 +1430,7 @@
                     </div>
                     <div class="knobs-row">
                         <div class="knob-group">
-                            <div class="knob"></div>
+                            <div class="knob" id="knob-lfo-rate"></div>
                             <span class="knob-label">RATE</span>
                         </div>
                         <div class="knob-group">
@@ -1934,7 +1934,7 @@
         // ===== KNOB INTERACTION =====
         const KNOB_MIN = -135;
         const KNOB_MAX = 135;
-        const COMBO_KNOB_IDS = ['knob-filter-cutoff', 'knob-filter-res', 'knob-filter-env'];
+        const COMBO_KNOB_IDS = ['knob-osc1-level', 'knob-filter-cutoff', 'knob-lfo-rate'];
         const COMBO_THRESHOLD = 130;
 
         document.querySelectorAll('.knob').forEach(knob => {
