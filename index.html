@@ -706,6 +706,25 @@
             display: inline;
         }
 
+        .admin-gate-link {
+            display: none;
+            color: var(--magenta);
+            font-size: 12px;
+            text-decoration: none;
+            border: 1px solid rgba(255, 0, 160, 0.4);
+            padding: 2px 6px;
+            transition: background 0.2s ease, box-shadow 0.2s ease;
+        }
+
+        .admin-gate-link:hover {
+            background: rgba(255, 0, 160, 0.15);
+            box-shadow: 0 0 10px rgba(255, 0, 160, 0.4);
+        }
+
+        body.debug-mode .admin-gate-link {
+            display: inline-block;
+        }
+
         body.debug-mode .main-title,
         body.debug-mode .glitch-layer {
             animation-duration: 1.4s;
@@ -1294,6 +1313,7 @@
             </div>
             <div class="top-bar-right">
                 <span class="debug-badge" id="debugBadge">&#9888; DEBUG OVERRIDE ACTIVE</span>
+                <a href="admin.html" class="admin-gate-link" id="adminGateLink">&#9881; ADMIN</a>
                 <span style="color: var(--text-dim); font-size: 10px;">SIGNAL: 39</span>
                 <div class="signal-bar">
                     <div></div><div></div><div></div><div></div><div></div>

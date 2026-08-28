@@ -105,6 +105,9 @@
         .timeline-item:nth-child(4) { animation-delay: 0.45s; }
         .timeline-item:nth-child(5) { animation-delay: 0.5s; }
         .timeline-item:nth-child(6) { animation-delay: 0.55s; }
+        .timeline-item:nth-child(7) { animation-delay: 0.6s; }
+        .timeline-item:nth-child(8) { animation-delay: 0.65s; }
+        .timeline-item:nth-child(9) { animation-delay: 0.7s; }
 
         .timeline-time {
             font-size: 1.2rem;
@@ -330,6 +333,29 @@
             font-style: italic;
         }
 
+        .admin-note.live {
+            font-style: normal;
+            color: #00ff88;
+        }
+
+        .admin-note.live::before {
+            content: '●';
+            margin-right: 6px;
+            animation: livePulse 1.5s ease-in-out infinite;
+        }
+
+        @keyframes livePulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.4; }
+        }
+
+        .leaderboard-empty {
+            color: var(--text-dim);
+            text-align: center;
+            padding: 10px;
+            font-size: 0.9rem;
+        }
+
         /* Footer */
         .schedule-footer {
             text-align: center;
@@ -416,6 +442,101 @@
     </div>
 
     <script>
+        // ===== LIVE LEADERBOARD (Google Sheets via Apps Script) =====
+        // After deploying the Apps Script Web App (see admin-api/README.md),
+        // paste its /exec URL here. Must match the URL used in admin.html.
+        const APPS_SCRIPT_URL = 'REPLACE_WITH_YOUR_DEPLOYED_WEB_APP_URL';
+
+        const RANK_MEDALS = ['🥇', '🥈', '🥉'];
+        const CATEGORY_LABELS = {
+            overall: '🏆 Overall Rankings',
+            quiz: '🎯 Quiz Master',
+            rhythm: '🎵 Rhythm Challenge',
+            creative: '🎨 Creative Contest',
+            speed: '⚡ Speed Race'
+        };
+
+        function categoryLabel(category) {
+            return CATEGORY_LABELS[category] || ('🎮 ' + category);
+        }
+
+        function renderLeaderboardList(players) {
+            const sorted = [...players].sort((a, b) => b.score - a.score).slice(0, 5);
+            if (sorted.length === 0) {
+                return '<li class="leaderboard-empty">No scores yet</li>';
+            }
+            return sorted.map((p, i) => {
+                const rankClass = i === 0 ? 'gold' : i === 1 ? 'silver' : i === 2 ? 'bronze' : '';
+                const rankDisplay = RANK_MEDALS[i] || String(i + 1);
+                return `
+                    <li class="leaderboard-item">
+                        <div class="rank ${rankClass}">${rankDisplay}</div>
+                        <div class="player-name">${escapeHtml(p.name)}</div>
+                        <div class="player-score">${p.score}</div>
+                    </li>
+                `;
+            }).join('');
+        }
+
+        function escapeHtml(str) {
+            const div = document.createElement('div');
+            div.textContent = str;
+            return div.innerHTML;
+        }
+
+        function renderLeaderboard(players, isLive) {
+            const container = document.getElementById('leaderboardContainer');
+            if (!container) return;
+
+            const byCategory = {};
+            players.forEach(p => {
+                const cat = p.category || 'overall';
+                if (!byCategory[cat]) byCategory[cat] = [];
+                byCategory[cat].push(p);
+            });
+
+            const categories = Object.keys(byCategory).sort((a, b) => {
+                if (a === 'overall') return -1;
+                if (b === 'overall') return 1;
+                return a.localeCompare(b);
+            });
+
+            if (categories.length === 0) categories.push('overall');
+            if (!byCategory.overall) byCategory.overall = [];
+
+            const noteClass = isLive ? 'admin-note live' : 'admin-note';
+            const noteText = isLive ? 'Live from admin dashboard' : 'Leaderboard unavailable right now';
+
+            container.innerHTML = categories.map(cat => `
+                <div class="leaderboard">
+                    <div class="leaderboard-title">${categoryLabel(cat)}</div>
+                    <ul class="leaderboard-list">
+                        ${renderLeaderboardList(byCategory[cat] || [])}
+                    </ul>
+                    <div class="${noteClass}">${noteText}</div>
+                </div>
+            `).join('');
+        }
+
+        async function fetchLeaderboard() {
+            if (!APPS_SCRIPT_URL || APPS_SCRIPT_URL.startsWith('REPLACE_WITH')) {
+                renderLeaderboard([], false);
+                return;
+            }
+            try {
+                const res = await fetch(APPS_SCRIPT_URL);
+                const data = await res.json();
+                renderLeaderboard(data.players || [], true);
+            } catch (err) {
+                renderLeaderboard([], false);
+            }
+        }
+
+        function initLeaderboard() {
+            fetchLeaderboard();
+            setInterval(fetchLeaderboard, 20000);
+        }
+
         const BIRTHDAY_DATE = new Date('2026-08-30T15:00:00+08:00').getTime();
         const urlParams = new URLSearchParams(window.location.search);
         const isUnlocked = urlParams.get('unlocked') === 'true';
@@ -448,45 +569,66 @@
                     <div class="timeline">
                         <h2 class="timeline-title">📅 Event Schedule</h2>
                         <div class="timeline-item">
-                            <div class="timeline-time">3:00 PM</div>
+                            <div class="timeline-time">3:00 – 3:30 PM</div>
                             <div class="timeline-content">
-                                <h3>🎤 Opening Ceremony & Welcome</h3>
-                                <p>Kick off the celebration with a special welcome message and introduction to today's games.</p>
+                                <h3>👋 Arrival / Hangout</h3>
+                                <p>Settle in and mingle before things kick off.</p>
                             </div>
                         </div>
                         <div class="timeline-item">
-                            <div class="timeline-time">3:30 PM</div>
+                            <div class="timeline-time">3:30 – 3:45 PM</div>
                             <div class="timeline-content">
-                                <h3>🎮 Games Begin</h3>
-                                <p>Multiple games running in parallel throughout the afternoon. Choose your challenges!</p>
+                                <h3>🎤 Opening</h3>
+                                <p>Explain the event and how Mikudollars work.</p>
                             </div>
                         </div>
                         <div class="timeline-item">
-                            <div class="timeline-time">5:00 PM</div>
+                            <div class="timeline-time">3:45 – 4:30 PM</div>
                             <div class="timeline-content">
-                                <h3>🏆 Mid-Event Leaderboard Review</h3>
-                                <p>Check the standings and see who's leading in Mikudollars!</p>
+                                <h3>🎯 Kahoot + PJSK Picture Quiz + Gartic Phone</h3>
+                                <p>First round of games — earn your Mikudollars!</p>
                             </div>
                         </div>
                         <div class="timeline-item">
-                            <div class="timeline-time">6:00 PM</div>
+                            <div class="timeline-time">4:30 – 5:00 PM</div>
                             <div class="timeline-content">
-                                <h3>🍰 Birthday Cake & Break</h3>
-                                <p>Time to celebrate with cake and refreshments before the final games.</p>
+                                <h3>🍽️ Food / Social</h3>
+                                <p>Break for food and catching up.</p>
                             </div>
                         </div>
                         <div class="timeline-item">
-                            <div class="timeline-time">6:30 PM</div>
+                            <div class="timeline-time">5:00 – 5:45 PM</div>
                             <div class="timeline-content">
-                                <h3>🎯 Final Round Games</h3>
-                                <p>Last chance to earn those crucial Mikudollars!</p>
+                                <h3>🎮 Jackbox + PJSK Audio Quiz</h3>
+                                <p>Second round of games.</p>
                             </div>
                         </div>
                         <div class="timeline-item">
-                            <div class="timeline-time">8:00 PM</div>
+                            <div class="timeline-time">5:45 – 6:30 PM</div>
                             <div class="timeline-content">
-                                <h3>🏅 Awards Ceremony & Closing</h3>
-                                <p>Announce the Mikudollars champions and wrap up the celebration.</p>
+                                <h3>🎂 Birthday / Cake</h3>
+                                <p>Time to celebrate with cake!</p>
+                            </div>
+                        </div>
+                        <div class="timeline-item">
+                            <div class="timeline-time">6:30 – 6:45 PM</div>
+                            <div class="timeline-content">
+                                <h3>✨ Final Rave Prep</h3>
+                                <p>Get ready for the Miku hologram rave.</p>
+                            </div>
+                        </div>
+                        <div class="timeline-item">
+                            <div class="timeline-time">6:45 – 8:45 PM</div>
+                            <div class="timeline-content">
+                                <h3>🎆 MIKU HOLOGRAM ft. ANDERKYO//39</h3>
+                                <p>The main event! Bring lightsticks! 🔦</p>
+                            </div>
+                        </div>
+                        <div class="timeline-item">
+                            <div class="timeline-time">8:45 – 9:00 PM</div>
+                            <div class="timeline-content">
+                                <h3>🏁 Marble Race + Lucky Draw</h3>
+                                <p>Marble race, then top 3 Miku merch lucky draw prizes.</p>
                             </div>
                         </div>
                     </div>
@@ -525,82 +667,20 @@
                     <!-- Leaderboards Section -->
                     <div class="leaderboard-section">
                         <h2 class="section-title">💰 Mikudollars Leaderboard</h2>
-                        <div class="leaderboard-container">
-                            <div class="leaderboard" id="overall-leaderboard">
-                                <div class="leaderboard-title">🏆 Overall Rankings</div>
-                                <ul class="leaderboard-list">
-                                    <li class="leaderboard-item">
-                                        <div class="rank gold">🥇</div>
-                                        <div class="player-name">[Player Name]</div>
-                                        <div class="player-score">0</div>
-                                    </li>
-                                    <li class="leaderboard-item">
-                                        <div class="rank silver">🥈</div>
-                                        <div class="player-name">[Player Name]</div>
-                                        <div class="player-score">0</div>
-                                    </li>
-                                    <li class="leaderboard-item">
-                                        <div class="rank bronze">🥉</div>
-                                        <div class="player-name">[Player Name]</div>
-                                        <div class="player-score">0</div>
-                                    </li>
-                                    <li class="leaderboard-item">
-                                        <div class="rank">4</div>
-                                        <div class="player-name">[Player Name]</div>
-                                        <div class="player-score">0</div>
-                                    </li>
-                                    <li class="leaderboard-item">
-                                        <div class="rank">5</div>
-                                        <div class="player-name">[Player Name]</div>
-                                        <div class="player-score">0</div>
-                                    </li>
-                                </ul>
-                                <div class="admin-note">📊 Real-time leaderboard updates from admin dashboard</div>
-                            </div>
-
-                            <div class="leaderboard">
-                                <div class="leaderboard-title">🎮 Quiz Master Scores</div>
-                                <ul class="leaderboard-list">
-                                    <li class="leaderboard-item">
-                                        <div class="rank gold">🥇</div>
-                                        <div class="player-name">[Player Name]</div>
-                                        <div class="player-score">0</div>
-                                    </li>
-                                    <li class="leaderboard-item">
-                                        <div class="rank silver">🥈</div>
-                                        <div class="player-name">[Player Name]</div>
-                                        <div class="player-score">0</div>
-                                    </li>
-                                    <li class="leaderboard-item">
-                                        <div class="rank bronze">🥉</div>
-                                        <div class="player-name">[Player Name]</div>
-                                        <div class="player-score">0</div>
-                                    </li>
-                                    <li class="leaderboard-item">
-                                        <div class="rank">4</div>
-                                        <div class="player-name">[Player Name]</div>
-                                        <div class="player-score">0</div>
-                                    </li>
-                                    <li class="leaderboard-item">
-                                        <div class="rank">5</div>
-                                        <div class="player-name">[Player Name]</div>
-                                        <div class="player-score">0</div>
-                                    </li>
-                                </ul>
-                                <div class="admin-note">📊 Scores updated throughout the event</div>
-                            </div>
+                        <div class="leaderboard-container" id="leaderboardContainer">
+                            <p style="color: var(--text-dim); text-align: center; grid-column: 1 / -1;">Loading live leaderboard&hellip;</p>
                         </div>
                     </div>
 
                     <div class="schedule-footer">
                         <p>🎂 Happy 19th Birthday, Miku! 🎂</p>
                         <p style="margin-top: 15px; font-size: 0.9rem;">
-                            <a href="index.html">← Back to Main</a> • 
-                            <a href="admin.html">📊 Admin Dashboard</a>
+                            <a href="index.html">← Back to Main</a>
                         </p>
                     </div>
                 </div>
             `;
+            initLeaderboard();
         }
     </script>
 </body>

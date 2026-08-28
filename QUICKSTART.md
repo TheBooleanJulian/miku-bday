@@ -8,10 +8,10 @@ A complete sci-fi futuristic countdown & event page for Miku's birthday celebrat
 
 ```
 ✅ index.html       → Main countdown page (shows time until Aug 30, 3pm SGT)
-✅ schedule.html    → Event schedule & leaderboard (unlocks automatically)
-✅ admin.html       → Dashboard to manage games & scores
-✅ style.css        → All styling (sci-fi neon theme)
-✅ script.js        → Countdown timer logic
+✅ schedule.html    → Event schedule & live leaderboard (unlocks automatically)
+✅ admin.html       → Password-gated dashboard to manage games & scores
+✅ admin-api/       → Apps Script + setup guide for the live Google Sheets leaderboard
+✅ style.css        → Shared styling for schedule.html & admin.html (sci-fi neon theme)
 ✅ README.md        → Full documentation
 ✅ QUICKSTART.md    → This file
 ```
@@ -23,15 +23,22 @@ A complete sci-fi futuristic countdown & event page for Miku's birthday celebrat
 2. Deploy the `miku-bday` folder to your domain `miku-bday.thebooleanjulian.dev`
 3. Done! 🎉
 
-### Step 2: Test Everything
+### Step 2: Set Up the Live Leaderboard (one-time)
+Follow **[admin-api/README.md](admin-api/README.md)** to deploy the Google Apps
+Script that backs the leaderboard, then paste the resulting URL into
+`APPS_SCRIPT_URL` in both `schedule.html` and `admin.html`. Takes ~2 minutes.
+Skip this and the leaderboard just shows "unavailable" — the rest of the site
+still works.
+
+### Step 3: Test Everything
 - Visit `miku-bday.thebooleanjulian.dev` → See countdown
 - Visit `miku-bday.thebooleanjulian.dev/schedule.html?unlocked=true` → See schedule
-- Visit `miku-bday.thebooleanjulian.dev/admin.html` → Manage games & scores
+- Visit `miku-bday.thebooleanjulian.dev/admin.html` → Enter the password → Manage games & scores
 
 ## 🎮 Using the Admin Dashboard
 
 ### Add Games
-1. Go to `admin.html`
+1. Go to `admin.html` and enter the password
 2. Fill in:
    - Game Title (e.g., "Quiz Master")
    - Emoji (e.g., 🎯)
@@ -47,7 +54,8 @@ A complete sci-fi futuristic countdown & event page for Miku's birthday celebrat
    - Mikudollars (score)
    - Game Category (Overall, Quiz Master, etc.)
 3. Click "✚ Add/Update Score"
-4. Leaderboard updates instantly!
+4. It's written straight to the Google Sheet — `schedule.html` picks it up
+   within ~20 seconds, no redeploy needed.
 
 ## 🧪 Testing Before Event
 
@@ -65,10 +73,9 @@ The schedule auto-unlocks when:
 ## 🎨 Customization
 
 ### Change Event Time
-Edit `script.js`, line 1:
-```javascript
-const BIRTHDAY_DATE = new Date('2026-08-30T15:00:00+08:00').getTime();
-```
+Each page keeps its own inline countdown target — update all of them together:
+- `index.html`: `const target = new Date('2026-08-30T15:00:00+08:00');`
+- `schedule.html`: `const BIRTHDAY_DATE = new Date('2026-08-30T15:00:00+08:00').getTime();`
 
 ### Change Colors
 Edit `style.css`, lines 8-15:
@@ -86,9 +93,9 @@ In `schedule.html`, duplicate the `.leaderboard` div and change the title
 
 ## 📊 Data Management
 
-- All data is stored in **browser localStorage**
-- Data persists across page refreshes
-- Each browser/device has separate storage
+- **Player scores** live in the [Google Sheet](admin-api/README.md) — shared
+  across every browser/device, no export needed to keep them in sync
+- **Game links** are still stored in this browser's **localStorage** only
 - Export data regularly as backup!
 
 ### Backup Your Data
@@ -99,9 +106,16 @@ In `schedule.html`, duplicate the `.leaderboard` div and change the title
 ## 🔐 Security Notes
 
 - This is a **public website** — anyone can see schedule content
-- Admin page has NO password protection — keep URL private!
-- For added security, use HTTP auth or host admin.html on a private URL
-- All data is client-side only (not sent to any server)
+- `admin.html` has no visible link anywhere on the site — the only way in is
+  a hidden easter egg on `index.html` (crank all three FILTER knobs to max),
+  which reveals a small ⚙ ADMIN link — plus a password prompt on the page
+  itself (default `xymiku39`, change it — see the comment at the top of
+  `admin.html`'s script)
+- This is **obscurity + a lightweight client-side check, not real server-side
+  auth** — anyone who finds the URL and reads the page source can see the API
+  key it uses to write scores. Good enough to keep casual guests out; don't
+  rely on it for anything sensitive
+- Reading the leaderboard (`schedule.html`) is intentionally public/unauthenticated
 
 ## 🐛 Quick Troubleshooting
 
@@ -109,7 +123,8 @@ In `schedule.html`, duplicate the `.leaderboard` div and change the title
 |-------|----------|
 | Countdown not showing | Refresh page, check browser console |
 | Schedule won't unlock | Check system time, use `?unlocked=true` to test |
-| Admin changes not saving | Check localStorage is enabled (not Incognito mode) |
+| Leaderboard shows "unavailable" | `APPS_SCRIPT_URL` not set yet — see `admin-api/README.md` |
+| Admin game links not saving | Check localStorage is enabled (not Incognito mode) |
 | Site looks broken | Clear browser cache (Ctrl+Shift+Delete) |
 | Mobile layout weird | Check viewport is set correctly in browser |
 
@@ -133,7 +148,7 @@ Site is fully responsive! Works great on:
 
 ## 💡 Pro Tips
 
-1. **Keep admin URL private** — Don't share `admin.html` link publicly
+1. **Keep the admin password private** — Don't share it or the knob-combo trick publicly
 2. **Update scores frequently** — Keep leaderboard fresh throughout the day
 3. **Test on mobile** — Most guests will visit on phones
 4. **Export before end** — Backup final scores in case of data loss
@@ -155,12 +170,12 @@ Site is fully responsive! Works great on:
 
 ## 🎂 Final Notes
 
-This is a **completely self-contained** website:
-- No backend server needed
-- No external API calls
-- No third-party dependencies
-- Just plain HTML, CSS, and JavaScript
-- Total size: ~50KB
+This is a **near-fully self-contained** website:
+- No backend server to host or maintain yourself
+- One external call: `schedule.html`/`admin.html` fetch the leaderboard from
+  a Google Apps Script Web App (see `admin-api/README.md`) — everything else
+  is plain HTML, CSS, and JavaScript
+- No third-party dependencies beyond your own Google account
 
 Deploy it and it just works! ✨
 

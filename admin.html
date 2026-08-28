@@ -248,6 +248,81 @@
             color: var(--primary-cyan);
         }
 
+        .info-box.warning {
+            border-left-color: var(--primary-magenta);
+            background: rgba(255, 0, 110, 0.1);
+        }
+
+        .info-box.warning strong {
+            color: var(--primary-magenta);
+        }
+
+        /* ===== PASSWORD GATE ===== */
+        .gate-overlay {
+            position: fixed;
+            inset: 0;
+            z-index: 2000;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: var(--dark-bg, #0a0e27);
+            padding: 20px;
+        }
+
+        .gate-box {
+            width: 100%;
+            max-width: 360px;
+            background: rgba(0, 212, 255, 0.08);
+            border: 2px solid var(--primary-cyan);
+            border-radius: 10px;
+            padding: 30px;
+            text-align: center;
+            box-shadow: 0 0 30px rgba(0, 212, 255, 0.25);
+        }
+
+        .gate-box h2 {
+            color: var(--primary-magenta);
+            margin-bottom: 8px;
+            text-shadow: 0 0 10px rgba(255, 0, 110, 0.5);
+        }
+
+        .gate-box p {
+            color: var(--text-dim);
+            font-size: 0.9rem;
+            margin-bottom: 20px;
+        }
+
+        .gate-box input {
+            width: 100%;
+            padding: 12px;
+            background: rgba(0, 0, 0, 0.3);
+            border: 1px solid var(--primary-cyan);
+            border-radius: 5px;
+            color: var(--text-light);
+            font-family: 'Courier New', monospace;
+            font-size: 1rem;
+            margin-bottom: 15px;
+            text-align: center;
+            letter-spacing: 2px;
+        }
+
+        .gate-box input:focus {
+            outline: none;
+            border-color: var(--primary-magenta);
+            box-shadow: 0 0 20px rgba(0, 212, 255, 0.3);
+        }
+
+        .gate-error {
+            color: var(--primary-magenta);
+            font-size: 0.85rem;
+            min-height: 1.2em;
+            margin-bottom: 10px;
+        }
+
+        #adminContent {
+            display: none;
+        }
+
         @media (max-width: 768px) {
             .admin-container {
                 padding: 20px 15px;
@@ -283,7 +358,18 @@
         </div>
     </div>
 
-    <div class="content">
+    <!-- Password Gate -->
+    <div class="gate-overlay" id="gateOverlay">
+        <div class="gate-box">
+            <h2>🔒 Restricted</h2>
+            <p>Enter the admin password to continue.</p>
+            <input type="password" id="gatePassword" placeholder="Password" autocomplete="off">
+            <div class="gate-error" id="gateError"></div>
+            <button onclick="attemptUnlock()" style="width: 100%;">Unlock</button>
+        </div>
+    </div>
+
+    <div class="content" id="adminContent">
         <div class="admin-container">
             <div class="admin-header">
                 <h1>⚙️ ADMIN DASHBOARD</h1>
@@ -333,7 +419,7 @@
             <div class="admin-section">
                 <h2 class="section-title">💰 Leaderboard Management</h2>
                 <div class="info-box">
-                    <strong>💡 Note:</strong> Add or update player scores. Use this to maintain Mikudollars rankings throughout the event.
+                    <strong>💡 Note:</strong> Scores are read from and written straight to the live Google Sheet — updates appear on schedule.html within ~20 seconds, no push/deploy needed.
                 </div>
 
                 <div class="form-group">
@@ -359,6 +445,7 @@
 
                 <div class="button-group">
                     <button onclick="addPlayer()">✚ Add/Update Score</button>
+                    <button class="button-secondary" onclick="loadPlayers()">🔄 Refresh</button>
                     <button class="button-secondary" onclick="exportLeaderboard()">📥 Export Scores</button>
                     <button class="button-danger" onclick="clearLeaderboard()">🗑️ Clear All</button>
                 </div>
@@ -381,7 +468,7 @@
 
                 <div style="margin-top: 20px; padding: 15px; background: rgba(0, 212, 255, 0.1); border-left: 4px solid var(--primary-cyan); border-radius: 5px;">
                     <p style="color: var(--text-dim); font-size: 0.95rem; margin: 0;">
-                        ✨ <strong>Pro Tip:</strong> Use the export functions to backup your data, or import it into a spreadsheet for easier management during the event.
+                        ✨ <strong>Pro Tip:</strong> Player scores already live in a Google Sheet — open it directly if you want to eyeball or bulk-edit rows. Use the export button for a quick JSON backup.
                     </p>
                 </div>
 
@@ -399,7 +486,7 @@
             <div class="admin-section">
                 <h2 class="section-title">💾 Data Management</h2>
                 <div class="info-box">
-                    <strong>⚠️ Note:</strong> This data is stored in your browser's localStorage. Clear browser data to reset.
+                    <strong>⚠️ Note:</strong> Game links are stored in this browser's localStorage only. Player scores live in the Google Sheet, shared across every device.
                 </div>
 
                 <button onclick="exportAllData()" class="button-secondary">📦 Export All Data</button>
@@ -418,16 +505,55 @@
     </div>
 
     <script>
+        // ===== ADMIN GATE (obscurity + lightweight check, not real auth — see README) =====
+        // Default password is "xymiku39". To change it: open this page's browser
+        // console and run
+        //   crypto.subtle.digest('SHA-256', new TextEncoder().encode('yourNewPassword'))
+        //     .then(b => console.log([...new Uint8Array(b)].map(x => x.toString(16).padStart(2, '0')).join('')))
+        // then paste the printed hash below.
+        const ADMIN_PASSWORD_HASH = 'cb6cbc8f43ea354b1e0b6720a31785d98fa7f48fb357f97a347d11fa5dd020ce';
+        const GATE_SESSION_KEY = 'miku_admin_authed';
+
+        async function sha256Hex(str) {
+            const buf = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(str));
+            return [...new Uint8Array(buf)].map(b => b.toString(16).padStart(2, '0')).join('');
+        }
+
+        async function attemptUnlock() {
+            const input = document.getElementById('gatePassword');
+            const hash = await sha256Hex(input.value);
+            if (hash === ADMIN_PASSWORD_HASH) {
+                localStorage.setItem(GATE_SESSION_KEY, '1');
+                openGate();
+            } else {
+                document.getElementById('gateError').textContent = 'Incorrect password.';
+                input.value = '';
+                input.focus();
+            }
+        }
+
+        function openGate() {
+            document.getElementById('gateOverlay').style.display = 'none';
+            document.getElementById('adminContent').style.display = 'block';
+            initDashboard();
+        }
+
+        document.getElementById('gatePassword').addEventListener('keydown', (e) => {
+            if (e.key === 'Enter') attemptUnlock();
+        });
+
+        // ===== LIVE LEADERBOARD (Google Sheets via Apps Script) =====
+        // Paste the same deployed Web App URL used in schedule.html.
+        const APPS_SCRIPT_URL = 'REPLACE_WITH_YOUR_DEPLOYED_WEB_APP_URL';
+        // Must match SHARED_SECRET in the Apps Script (admin-api/Code.gs).
+        const ADMIN_KEY = '142c5803f23d7469e0414f4e4b3b3f770c6891690414c18b';
+
         const STORAGE_KEY_GAMES = 'miku_games';
-        const STORAGE_KEY_PLAYERS = 'miku_players';
+        let playersCache = [];
 
         // Load data from localStorage
         function loadGames() {
             return JSON.parse(localStorage.getItem(STORAGE_KEY_GAMES) || '[]');
-        }
-
-        function loadPlayers() {
-            return JSON.parse(localStorage.getItem(STORAGE_KEY_PLAYERS) || '[]');
         }
 
         // Save data to localStorage
@@ -436,8 +562,39 @@
             renderGames();
         }
 
-        function savePlayers(players) {
-            localStorage.setItem(STORAGE_KEY_PLAYERS, JSON.stringify(players));
+        function apiConfigured() {
+            return APPS_SCRIPT_URL && !APPS_SCRIPT_URL.startsWith('REPLACE_WITH');
+        }
+
+        async function apiGet() {
+            const res = await fetch(APPS_SCRIPT_URL);
+            const data = await res.json();
+            return data.players || [];
+        }
+
+        async function apiPost(payload) {
+            const res = await fetch(APPS_SCRIPT_URL, {
+                method: 'POST',
+                body: JSON.stringify({ key: ADMIN_KEY, ...payload })
+            });
+            const data = await res.json();
+            if (!data.ok) throw new Error(data.error || 'Request failed');
+            return data.players || [];
+        }
+
+        async function loadPlayers() {
+            if (!apiConfigured()) {
+                showFeedback('playerFeedback', 'Apps Script URL not configured yet — see admin-api/README.md', 'error');
+                playersCache = [];
+                renderPlayers();
+                return;
+            }
+            try {
+                playersCache = await apiGet();
+            } catch (err) {
+                showFeedback('playerFeedback', 'Could not reach the leaderboard sheet', 'error');
+                playersCache = [];
+            }
             renderPlayers();
         }
 
@@ -466,7 +623,7 @@
         }
 
         // Add/Update player
-        function addPlayer() {
+        async function addPlayer() {
             const name = document.getElementById('playerName').value.trim();
             const score = parseInt(document.getElementById('playerScore').value) || 0;
             const category = document.getElementById('gameCategory').value;
@@ -475,21 +632,20 @@
                 showFeedback('playerFeedback', 'Please enter a player name', 'error');
                 return;
             }
-
-            const players = loadPlayers();
-            const existingIndex = players.findIndex(p => p.name === name && p.category === category);
-
-            if (existingIndex >= 0) {
-                players[existingIndex].score = score;
-            } else {
-                players.push({ id: Date.now(), name, score, category });
+            if (!apiConfigured()) {
+                showFeedback('playerFeedback', 'Apps Script URL not configured yet — see admin-api/README.md', 'error');
+                return;
             }
 
-            savePlayers(players);
-            document.getElementById('playerName').value = '';
-            document.getElementById('playerScore').value = '0';
-
-            showFeedback('playerFeedback', '✓ Player score updated!', 'success');
+            try {
+                playersCache = await apiPost({ action: 'upsert', name, category, score });
+                renderPlayers();
+                document.getElementById('playerName').value = '';
+                document.getElementById('playerScore').value = '0';
+                showFeedback('playerFeedback', '✓ Player score updated!', 'success');
+            } catch (err) {
+                showFeedback('playerFeedback', 'Update failed: ' + err.message, 'error');
+            }
         }
 
         // Render games
@@ -516,24 +672,23 @@
 
         // Render players
         function renderPlayers() {
-            const players = loadPlayers();
             const container = document.getElementById('playersList');
 
-            if (players.length === 0) {
+            if (playersCache.length === 0) {
                 container.innerHTML = '<p style="color: var(--text-dim); text-align: center;">No players added yet</p>';
                 return;
             }
 
-            const sorted = [...players].sort((a, b) => b.score - a.score);
+            const sorted = [...playersCache].sort((a, b) => b.score - a.score);
 
-            container.innerHTML = sorted.map((player, index) => `
+            container.innerHTML = sorted.map((player) => `
                 <div class="player-item">
                     <div>
                         <strong style="color: var(--primary-cyan);">${player.name}</strong>
                         <span style="margin-left: 10px; font-size: 0.85rem; color: var(--text-dim);">[${player.category}]</span>
                         <p style="color: var(--primary-magenta); margin-top: 5px; font-weight: bold;">💰 ${player.score}</p>
                     </div>
-                    <button class="button-danger" onclick="deletePlayer(${player.id})">Delete</button>
+                    <button class="button-danger" onclick="deletePlayer('${player.name.replace(/'/g, "\\'")}', '${player.category}')">Delete</button>
                 </div>
             `).join('');
         }
@@ -547,29 +702,33 @@
             }
         }
 
-        function deletePlayer(id) {
-            if (confirm('Delete this player?')) {
-                const players = loadPlayers();
-                savePlayers(players.filter(p => p.id !== id));
+        async function deletePlayer(name, category) {
+            if (!confirm('Delete this player?')) return;
+            try {
+                playersCache = await apiPost({ action: 'delete', name, category });
+                renderPlayers();
                 showFeedback('playerFeedback', '✓ Player deleted', 'success');
+            } catch (err) {
+                showFeedback('playerFeedback', 'Delete failed: ' + err.message, 'error');
             }
         }
 
-        function clearLeaderboard() {
-            if (confirm('Clear all player scores?')) {
-                localStorage.setItem(STORAGE_KEY_PLAYERS, '[]');
+        async function clearLeaderboard() {
+            if (!confirm('Clear all player scores?')) return;
+            try {
+                playersCache = await apiPost({ action: 'clear' });
                 renderPlayers();
                 showFeedback('playerFeedback', '✓ Leaderboard cleared', 'success');
+            } catch (err) {
+                showFeedback('playerFeedback', 'Clear failed: ' + err.message, 'error');
             }
         }
 
         function clearAllData() {
-            if (confirm('This will delete ALL games and players. Are you sure?')) {
+            if (confirm('This will delete all locally-stored games (player scores live in the Google Sheet and are not affected). Are you sure?')) {
                 localStorage.removeItem(STORAGE_KEY_GAMES);
-                localStorage.removeItem(STORAGE_KEY_PLAYERS);
                 renderGames();
-                renderPlayers();
-                showFeedback('gameFeedback', '✓ All data cleared', 'success');
+                showFeedback('gameFeedback', '✓ Local game data cleared', 'success');
             }
         }
 
@@ -581,15 +740,14 @@
         }
 
         function exportLeaderboard() {
-            const players = loadPlayers();
-            const dataStr = JSON.stringify(players, null, 2);
+            const dataStr = JSON.stringify(playersCache, null, 2);
             showExportData(dataStr);
         }
 
         function exportAllData() {
             const data = {
                 games: loadGames(),
-                players: loadPlayers(),
+                players: playersCache,
                 exported: new Date().toISOString()
             };
             const dataStr = JSON.stringify(data, null, 2);
@@ -611,9 +769,15 @@
             }, 3000);
         }
 
-        // Initial render
-        renderGames();
-        renderPlayers();
+        // Initial render (only runs once the password gate is passed)
+        function initDashboard() {
+            renderGames();
+            loadPlayers();
+        }
+
+        if (localStorage.getItem(GATE_SESSION_KEY) === '1') {
+            openGate();
+        }
     </script>
 </body>
 </html>
