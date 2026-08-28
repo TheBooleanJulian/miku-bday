@@ -380,22 +380,22 @@
             <div class="admin-section">
                 <h2 class="section-title">🎮 Game Management</h2>
                 <div class="info-box">
-                    <strong>💡 Note:</strong> Add or update game links here. Changes appear on the schedule page immediately.
+                    <strong>💡 Note:</strong> Add or delete games here — written straight to the live Google Sheet, so schedule.html picks them up within ~20 seconds. No push/deploy needed.
                 </div>
 
                 <div class="form-group">
                     <label for="gameName">Game Title</label>
-                    <input type="text" id="gameName" placeholder="e.g., Quiz Master" value="Quiz Master">
+                    <input type="text" id="gameName" placeholder="e.g., Kahoot">
                 </div>
 
                 <div class="form-group">
                     <label for="gameEmoji">Emoji Icon</label>
-                    <input type="text" id="gameEmoji" placeholder="e.g., 🎯" value="🎯" maxlength="2" style="max-width: 100px;">
+                    <input type="text" id="gameEmoji" placeholder="e.g., 🎯" maxlength="2" style="max-width: 100px;">
                 </div>
 
                 <div class="form-group">
                     <label for="gameDescription">Description</label>
-                    <textarea id="gameDescription" placeholder="Describe the game...">Test your Miku knowledge with our trivia challenge!</textarea>
+                    <textarea id="gameDescription" placeholder="Describe the game..."></textarea>
                 </div>
 
                 <div class="form-group">
@@ -405,6 +405,7 @@
 
                 <div class="button-group">
                     <button onclick="addGame()">✚ Add Game</button>
+                    <button class="button-secondary" onclick="loadData()">🔄 Refresh</button>
                     <button class="button-secondary" onclick="exportGames()">📥 Export Games</button>
                 </div>
 
@@ -415,45 +416,25 @@
                 </div>
             </div>
 
-            <!-- Player/Leaderboard Management -->
+            <!-- Leaderboard Preview -->
             <div class="admin-section">
-                <h2 class="section-title">💰 Leaderboard Management</h2>
+                <h2 class="section-title">💰 Mikudollars Leaderboard</h2>
                 <div class="info-box">
-                    <strong>💡 Note:</strong> Scores are read from and written straight to the live Google Sheet — updates appear on schedule.html within ~20 seconds, no push/deploy needed.
-                </div>
-
-                <div class="form-group">
-                    <label for="playerName">Player Name</label>
-                    <input type="text" id="playerName" placeholder="Enter player name">
-                </div>
-
-                <div class="form-group">
-                    <label for="playerScore">Mikudollars</label>
-                    <input type="number" id="playerScore" placeholder="0" min="0" value="0">
-                </div>
-
-                <div class="form-group">
-                    <label for="gameCategory">Game Category</label>
-                    <select id="gameCategory">
-                        <option value="overall">Overall Rankings</option>
-                        <option value="quiz">Quiz Master</option>
-                        <option value="rhythm">Rhythm Challenge</option>
-                        <option value="creative">Creative Contest</option>
-                        <option value="speed">Speed Race</option>
-                    </select>
+                    <strong>💡 Note:</strong> This is a read-only preview. Edit attendance/scores directly in the <strong>Leaderboard</strong> tab of the Google Sheet — each guest's score is 100&times; the sum of their row. This list updates within ~20 seconds of a sheet edit.
                 </div>
 
                 <div class="button-group">
-                    <button onclick="addPlayer()">✚ Add/Update Score</button>
-                    <button class="button-secondary" onclick="loadPlayers()">🔄 Refresh</button>
+                    <a href="https://docs.google.com/spreadsheets/d/1n3x0Ja9P03StAkhcK54SxXFhuk-Lkssptwvr0lCp0EA/edit" target="_blank" rel="noopener" style="text-decoration: none;">
+                        <button>🔗 Open Sheet to Edit Scores</button>
+                    </a>
+                    <button class="button-secondary" onclick="loadData()">🔄 Refresh</button>
                     <button class="button-secondary" onclick="exportLeaderboard()">📥 Export Scores</button>
-                    <button class="button-danger" onclick="clearLeaderboard()">🗑️ Clear All</button>
                 </div>
 
                 <div id="playerFeedback" class="feedback"></div>
 
                 <div id="playersList" class="player-list" style="margin-top: 25px;">
-                    <!-- Players will be listed here -->
+                    <!-- Top 5 will be listed here -->
                 </div>
             </div>
 
@@ -468,7 +449,7 @@
 
                 <div style="margin-top: 20px; padding: 15px; background: rgba(0, 212, 255, 0.1); border-left: 4px solid var(--primary-cyan); border-radius: 5px;">
                     <p style="color: var(--text-dim); font-size: 0.95rem; margin: 0;">
-                        ✨ <strong>Pro Tip:</strong> Player scores already live in a Google Sheet — open it directly if you want to eyeball or bulk-edit rows. Use the export button for a quick JSON backup.
+                        ✨ <strong>Pro Tip:</strong> Both games and scores live in the Google Sheet now — it's the single source of truth. Use the export buttons above for a quick JSON backup.
                     </p>
                 </div>
 
@@ -486,11 +467,10 @@
             <div class="admin-section">
                 <h2 class="section-title">💾 Data Management</h2>
                 <div class="info-box">
-                    <strong>⚠️ Note:</strong> Game links are stored in this browser's localStorage only. Player scores live in the Google Sheet, shared across every device.
+                    <strong>⚠️ Note:</strong> Games and scores both live in the Google Sheet, shared across every device — there's no local/per-browser data left to reset here.
                 </div>
 
                 <button onclick="exportAllData()" class="button-secondary">📦 Export All Data</button>
-                <button onclick="clearAllData()" class="button-danger" style="margin-left: 10px;">🗑️ Clear Everything</button>
 
                 <div id="dataExport" class="data-export" style="margin-top: 15px; display: none;"></div>
             </div>
@@ -542,25 +522,14 @@
             if (e.key === 'Enter') attemptUnlock();
         });
 
-        // ===== LIVE LEADERBOARD (Google Sheets via Apps Script) =====
+        // ===== LIVE DATA (Google Sheets via Apps Script) =====
         // Paste the same deployed Web App URL used in schedule.html.
         const APPS_SCRIPT_URL = 'REPLACE_WITH_YOUR_DEPLOYED_WEB_APP_URL';
         // Must match SHARED_SECRET in the Apps Script (admin-api/Code.gs).
         const ADMIN_KEY = '142c5803f23d7469e0414f4e4b3b3f770c6891690414c18b';
 
-        const STORAGE_KEY_GAMES = 'miku_games';
         let playersCache = [];
-
-        // Load data from localStorage
-        function loadGames() {
-            return JSON.parse(localStorage.getItem(STORAGE_KEY_GAMES) || '[]');
-        }
-
-        // Save data to localStorage
-        function saveGames(games) {
-            localStorage.setItem(STORAGE_KEY_GAMES, JSON.stringify(games));
-            renderGames();
-        }
+        let gamesCache = [];
 
         function apiConfigured() {
             return APPS_SCRIPT_URL && !APPS_SCRIPT_URL.startsWith('REPLACE_WITH');
@@ -568,8 +537,7 @@
 
         async function apiGet() {
             const res = await fetch(APPS_SCRIPT_URL);
-            const data = await res.json();
-            return data.players || [];
+            return res.json();
         }
 
         async function apiPost(payload) {
@@ -579,179 +547,138 @@
             });
             const data = await res.json();
             if (!data.ok) throw new Error(data.error || 'Request failed');
-            return data.players || [];
+            return data;
         }
 
-        async function loadPlayers() {
+        async function loadData() {
             if (!apiConfigured()) {
                 showFeedback('playerFeedback', 'Apps Script URL not configured yet — see admin-api/README.md', 'error');
+                showFeedback('gameFeedback', 'Apps Script URL not configured yet — see admin-api/README.md', 'error');
                 playersCache = [];
+                gamesCache = [];
                 renderPlayers();
+                renderGames();
                 return;
             }
             try {
-                playersCache = await apiGet();
+                const data = await apiGet();
+                playersCache = data.players || [];
+                gamesCache = data.games || [];
             } catch (err) {
-                showFeedback('playerFeedback', 'Could not reach the leaderboard sheet', 'error');
+                showFeedback('playerFeedback', 'Could not reach the sheet', 'error');
                 playersCache = [];
+                gamesCache = [];
             }
             renderPlayers();
+            renderGames();
         }
 
         // Add game
-        function addGame() {
-            const name = document.getElementById('gameName').value.trim();
+        async function addGame() {
+            const title = document.getElementById('gameName').value.trim();
             const emoji = document.getElementById('gameEmoji').value.trim();
             const description = document.getElementById('gameDescription').value.trim();
-            const link = document.getElementById('gameLink').value.trim();
+            const url = document.getElementById('gameLink').value.trim();
 
-            if (!name || !emoji || !description || !link) {
+            if (!title || !emoji || !description || !url) {
                 showFeedback('gameFeedback', 'Please fill in all fields', 'error');
                 return;
             }
-
-            const games = loadGames();
-            games.push({ id: Date.now(), name, emoji, description, link, created: new Date().toLocaleString() });
-            saveGames(games);
-
-            document.getElementById('gameName').value = '';
-            document.getElementById('gameEmoji').value = '';
-            document.getElementById('gameDescription').value = '';
-            document.getElementById('gameLink').value = '';
-
-            showFeedback('gameFeedback', '✓ Game added successfully!', 'success');
-        }
-
-        // Add/Update player
-        async function addPlayer() {
-            const name = document.getElementById('playerName').value.trim();
-            const score = parseInt(document.getElementById('playerScore').value) || 0;
-            const category = document.getElementById('gameCategory').value;
-
-            if (!name) {
-                showFeedback('playerFeedback', 'Please enter a player name', 'error');
-                return;
-            }
             if (!apiConfigured()) {
-                showFeedback('playerFeedback', 'Apps Script URL not configured yet — see admin-api/README.md', 'error');
+                showFeedback('gameFeedback', 'Apps Script URL not configured yet — see admin-api/README.md', 'error');
                 return;
             }
 
             try {
-                playersCache = await apiPost({ action: 'upsert', name, category, score });
+                const data = await apiPost({ action: 'addGame', title, emoji, description, url });
+                playersCache = data.players || [];
+                gamesCache = data.games || [];
                 renderPlayers();
-                document.getElementById('playerName').value = '';
-                document.getElementById('playerScore').value = '0';
-                showFeedback('playerFeedback', '✓ Player score updated!', 'success');
+                renderGames();
+
+                document.getElementById('gameName').value = '';
+                document.getElementById('gameEmoji').value = '';
+                document.getElementById('gameDescription').value = '';
+                document.getElementById('gameLink').value = '';
+
+                showFeedback('gameFeedback', '✓ Game added successfully!', 'success');
             } catch (err) {
-                showFeedback('playerFeedback', 'Update failed: ' + err.message, 'error');
+                showFeedback('gameFeedback', 'Add failed: ' + err.message, 'error');
+            }
+        }
+
+        async function deleteGame(title) {
+            if (!confirm('Delete this game?')) return;
+            try {
+                const data = await apiPost({ action: 'deleteGame', title });
+                playersCache = data.players || [];
+                gamesCache = data.games || [];
+                renderPlayers();
+                renderGames();
+                showFeedback('gameFeedback', '✓ Game deleted', 'success');
+            } catch (err) {
+                showFeedback('gameFeedback', 'Delete failed: ' + err.message, 'error');
             }
         }
 
         // Render games
         function renderGames() {
-            const games = loadGames();
             const container = document.getElementById('gamesList');
 
-            if (games.length === 0) {
+            if (gamesCache.length === 0) {
                 container.innerHTML = '<p style="color: var(--text-dim); text-align: center;">No games added yet</p>';
                 return;
             }
 
-            container.innerHTML = games.map(game => `
+            container.innerHTML = gamesCache.map(game => `
                 <div class="game-item">
                     <div class="game-info">
-                        <h4>${game.emoji} ${game.name}</h4>
-                        <p>${game.link}</p>
+                        <h4>${game.emoji} ${game.title}</h4>
+                        <p>${game.url}</p>
                         <p style="font-size: 0.8rem; margin-top: 5px; color: var(--text-dim);">${game.description}</p>
                     </div>
-                    <button class="button-danger" onclick="deleteGame(${game.id})">Delete</button>
+                    <button class="button-danger" onclick="deleteGame('${game.title.replace(/'/g, "\\'")}')">Delete</button>
                 </div>
             `).join('');
         }
 
-        // Render players
+        // Render players (top 5 only, matching the public leaderboard)
         function renderPlayers() {
             const container = document.getElementById('playersList');
 
             if (playersCache.length === 0) {
-                container.innerHTML = '<p style="color: var(--text-dim); text-align: center;">No players added yet</p>';
+                container.innerHTML = '<p style="color: var(--text-dim); text-align: center;">No scores yet — add rows to the Leaderboard sheet</p>';
                 return;
             }
 
-            const sorted = [...playersCache].sort((a, b) => b.score - a.score);
+            const top5 = playersCache.slice(0, 5);
 
-            container.innerHTML = sorted.map((player) => `
+            container.innerHTML = top5.map((player, i) => `
                 <div class="player-item">
                     <div>
-                        <strong style="color: var(--primary-cyan);">${player.name}</strong>
-                        <span style="margin-left: 10px; font-size: 0.85rem; color: var(--text-dim);">[${player.category}]</span>
+                        <strong style="color: var(--primary-cyan);">#${i + 1} ${player.name}</strong>
                         <p style="color: var(--primary-magenta); margin-top: 5px; font-weight: bold;">💰 ${player.score}</p>
                     </div>
-                    <button class="button-danger" onclick="deletePlayer('${player.name.replace(/'/g, "\\'")}', '${player.category}')">Delete</button>
                 </div>
             `).join('');
         }
 
-        // Delete functions
-        function deleteGame(id) {
-            if (confirm('Delete this game?')) {
-                const games = loadGames();
-                saveGames(games.filter(g => g.id !== id));
-                showFeedback('gameFeedback', '✓ Game deleted', 'success');
-            }
-        }
-
-        async function deletePlayer(name, category) {
-            if (!confirm('Delete this player?')) return;
-            try {
-                playersCache = await apiPost({ action: 'delete', name, category });
-                renderPlayers();
-                showFeedback('playerFeedback', '✓ Player deleted', 'success');
-            } catch (err) {
-                showFeedback('playerFeedback', 'Delete failed: ' + err.message, 'error');
-            }
-        }
-
-        async function clearLeaderboard() {
-            if (!confirm('Clear all player scores?')) return;
-            try {
-                playersCache = await apiPost({ action: 'clear' });
-                renderPlayers();
-                showFeedback('playerFeedback', '✓ Leaderboard cleared', 'success');
-            } catch (err) {
-                showFeedback('playerFeedback', 'Clear failed: ' + err.message, 'error');
-            }
-        }
-
-        function clearAllData() {
-            if (confirm('This will delete all locally-stored games (player scores live in the Google Sheet and are not affected). Are you sure?')) {
-                localStorage.removeItem(STORAGE_KEY_GAMES);
-                renderGames();
-                showFeedback('gameFeedback', '✓ Local game data cleared', 'success');
-            }
-        }
-
         // Export functions
         function exportGames() {
-            const games = loadGames();
-            const dataStr = JSON.stringify(games, null, 2);
-            showExportData(dataStr);
+            showExportData(JSON.stringify(gamesCache, null, 2));
         }
 
         function exportLeaderboard() {
-            const dataStr = JSON.stringify(playersCache, null, 2);
-            showExportData(dataStr);
+            showExportData(JSON.stringify(playersCache, null, 2));
         }
 
         function exportAllData() {
             const data = {
-                games: loadGames(),
+                games: gamesCache,
                 players: playersCache,
                 exported: new Date().toISOString()
             };
-            const dataStr = JSON.stringify(data, null, 2);
-            showExportData(dataStr);
+            showExportData(JSON.stringify(data, null, 2));
         }
 
         function showExportData(data) {
@@ -771,8 +698,7 @@
 
         // Initial render (only runs once the password gate is passed)
         function initDashboard() {
-            renderGames();
-            loadPlayers();
+            loadData();
         }
 
         if (localStorage.getItem(GATE_SESSION_KEY) === '1') {

@@ -1,6 +1,13 @@
-# Live leaderboard backend (Google Sheets + Apps Script)
+# Live leaderboard + games backend (Google Sheets + Apps Script)
 
-The leaderboard is backed by a real Google Sheet — **[MIKU-19 Leaderboard](https://docs.google.com/spreadsheets/d/1n3x0Ja9P03StAkhcK54SxXFhuk-Lkssptwvr0lCp0EA/edit)** — with columns `name | category | score | updated`. `admin.html` writes to it and `schedule.html` reads from it through a small Google Apps Script "Web App" that acts as the API. This is a one-time, ~2 minute manual setup (Google requires you personally to authorize the deployment — it can't be scripted from outside your account).
+The leaderboard and game list are backed by a real Google Sheet — **[MIKU-19 Leaderboard](https://docs.google.com/spreadsheets/d/1n3x0Ja9P03StAkhcK54SxXFhuk-Lkssptwvr0lCp0EA/edit)** — through a small Google Apps Script "Web App" that acts as the API. This is a one-time, ~2 minute manual setup (Google requires you personally to authorize the deployment — it can't be scripted from outside your account).
+
+## Sheet layout
+
+`Code.gs` auto-creates both tabs (with correct headers) the first time it runs, so you don't need to set this up by hand — but here's what it looks like:
+
+- **`Leaderboard`** tab — `name | attendance | game 1 | game 2 | ...`. One row per guest. **You edit the score values by hand directly in this sheet** (attendance + each game's points) — the API only reads them, it never writes here. Add more `game 3`, `game 4`, ... columns as you add games; the script sums however many columns exist for each row, multiplies by 100, and that's the guest's Mikudollars score. No code changes needed when you add a column.
+- **`Games`** tab — `title | emoji | description | url`. One row per game. This one **is** written to by `admin.html`'s Game Management form — add/delete games there and they show up on `schedule.html` automatically.
 
 ## 1. Open the Apps Script editor
 
@@ -25,11 +32,13 @@ Paste that URL into the `APPS_SCRIPT_URL` constant in **both**:
 - [`schedule.html`](../schedule.html) (search for `REPLACE_WITH_YOUR_DEPLOYED_WEB_APP_URL`)
 - [`admin.html`](../admin.html) (same placeholder)
 
-Commit and push. That's the only push needed — after this, every score you add/edit/delete from the admin dashboard goes straight to the sheet and shows up on `schedule.html` within ~20 seconds, no further deploys required.
+Commit and push. That's the only push needed — after this:
+- **Scores**: edit the `Leaderboard` tab directly (attendance + game columns); `schedule.html` picks up the change within ~20 seconds.
+- **Games**: add/edit/delete from `admin.html`'s Game Management form; same ~20 second turnaround on `schedule.html`.
 
 ## Notes
 
 - `SHARED_SECRET` in `Code.gs` must match `ADMIN_KEY` in `admin.html` — they're already set to the same generated value. If you regenerate one, update the other.
-- `doGet` (reading the leaderboard) is intentionally public/unauthenticated — that's what lets `schedule.html` show live scores to guests without any login. `doPost` (writing) requires `SHARED_SECRET`, which only `admin.html`'s source carries.
+- `doGet` (reading leaderboard + games) is intentionally public/unauthenticated — that's what lets `schedule.html` show live data to guests without any login. `doPost` (adding/deleting games) requires `SHARED_SECRET`, which only `admin.html`'s source carries.
 - If you ever edit `Code.gs` again, you need to **Deploy → Manage deployments → edit (pencil) → New version → Deploy** for changes to take effect — saving alone doesn't republish a live deployment.
-- The sheet is manually creatable/browsable any time — open it directly if you want to bulk-edit or eyeball scores outside the admin dashboard.
+- Open the sheet directly any time to bulk-edit attendance/scores or eyeball the numbers — that's the normal workflow now, not a fallback.

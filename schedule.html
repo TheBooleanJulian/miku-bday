@@ -239,8 +239,8 @@
 
         .leaderboard-container {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-            gap: 30px;
+            max-width: 480px;
+            margin: 0 auto;
         }
 
         .leaderboard {
@@ -447,36 +447,11 @@
         // paste its /exec URL here. Must match the URL used in admin.html.
         const APPS_SCRIPT_URL = 'REPLACE_WITH_YOUR_DEPLOYED_WEB_APP_URL';
 
+        // Footer credit backlinks — see index.html for the same constants.
+        const CREDIT_JULIAN_URL = 'https://thebooleanjulian.dev';
+        const CREDIT_XYMIKU_URL = 'PASTE_XYMIKU_39_LINK_HERE';
+
         const RANK_MEDALS = ['🥇', '🥈', '🥉'];
-        const CATEGORY_LABELS = {
-            overall: '🏆 Overall Rankings',
-            quiz: '🎯 Quiz Master',
-            rhythm: '🎵 Rhythm Challenge',
-            creative: '🎨 Creative Contest',
-            speed: '⚡ Speed Race'
-        };
-
-        function categoryLabel(category) {
-            return CATEGORY_LABELS[category] || ('🎮 ' + category);
-        }
-
-        function renderLeaderboardList(players) {
-            const sorted = [...players].sort((a, b) => b.score - a.score).slice(0, 5);
-            if (sorted.length === 0) {
-                return '<li class="leaderboard-empty">No scores yet</li>';
-            }
-            return sorted.map((p, i) => {
-                const rankClass = i === 0 ? 'gold' : i === 1 ? 'silver' : i === 2 ? 'bronze' : '';
-                const rankDisplay = RANK_MEDALS[i] || String(i + 1);
-                return `
-                    <li class="leaderboard-item">
-                        <div class="rank ${rankClass}">${rankDisplay}</div>
-                        <div class="player-name">${escapeHtml(p.name)}</div>
-                        <div class="player-score">${p.score}</div>
-                    </li>
-                `;
-            }).join('');
-        }
 
         function escapeHtml(str) {
             const div = document.createElement('div');
@@ -488,53 +463,72 @@
             const container = document.getElementById('leaderboardContainer');
             if (!container) return;
 
-            const byCategory = {};
-            players.forEach(p => {
-                const cat = p.category || 'overall';
-                if (!byCategory[cat]) byCategory[cat] = [];
-                byCategory[cat].push(p);
-            });
-
-            const categories = Object.keys(byCategory).sort((a, b) => {
-                if (a === 'overall') return -1;
-                if (b === 'overall') return 1;
-                return a.localeCompare(b);
-            });
-
-            if (categories.length === 0) categories.push('overall');
-            if (!byCategory.overall) byCategory.overall = [];
+            const top5 = [...players].sort((a, b) => b.score - a.score).slice(0, 5);
+            const items = top5.length === 0
+                ? '<li class="leaderboard-empty">No scores yet</li>'
+                : top5.map((p, i) => {
+                    const rankClass = i === 0 ? 'gold' : i === 1 ? 'silver' : i === 2 ? 'bronze' : '';
+                    const rankDisplay = RANK_MEDALS[i] || String(i + 1);
+                    return `
+                        <li class="leaderboard-item">
+                            <div class="rank ${rankClass}">${rankDisplay}</div>
+                            <div class="player-name">${escapeHtml(p.name)}</div>
+                            <div class="player-score">${p.score}</div>
+                        </li>
+                    `;
+                }).join('');
 
             const noteClass = isLive ? 'admin-note live' : 'admin-note';
-            const noteText = isLive ? 'Live from admin dashboard' : 'Leaderboard unavailable right now';
+            const noteText = isLive ? 'Live from the Google Sheet' : 'Leaderboard unavailable right now';
 
-            container.innerHTML = categories.map(cat => `
+            container.innerHTML = `
                 <div class="leaderboard">
-                    <div class="leaderboard-title">${categoryLabel(cat)}</div>
-                    <ul class="leaderboard-list">
-                        ${renderLeaderboardList(byCategory[cat] || [])}
-                    </ul>
+                    <div class="leaderboard-title">🏆 Mikudollars Leaderboard</div>
+                    <ul class="leaderboard-list">${items}</ul>
                     <div class="${noteClass}">${noteText}</div>
                 </div>
+            `;
+        }
+
+        function renderGames(games) {
+            const container = document.getElementById('gamesContainer');
+            if (!container) return;
+
+            if (games.length === 0) {
+                container.innerHTML = '<p style="color: var(--text-dim); text-align: center; grid-column: 1 / -1;">Games will appear here once added in the admin dashboard.</p>';
+                return;
+            }
+
+            container.innerHTML = games.map(g => `
+                <a href="${g.url}" class="game-card" target="_blank" rel="noopener">
+                    <div class="game-icon">${g.emoji}</div>
+                    <div class="game-title">${escapeHtml(g.title)}</div>
+                    <div class="game-description">${escapeHtml(g.description)}</div>
+                    <div class="game-link-btn">Join Game</div>
+                </a>
             `).join('');
         }
 
-        async function fetchLeaderboard() {
+        async function fetchLiveData() {
             if (!APPS_SCRIPT_URL || APPS_SCRIPT_URL.startsWith('REPLACE_WITH')) {
                 renderLeaderboard([], false);
+                renderGames([]);
                 return;
             }
             try {
                 const res = await fetch(APPS_SCRIPT_URL);
                 const data = await res.json();
                 renderLeaderboard(data.players || [], true);
+                renderGames(data.games || []);
             } catch (err) {
                 renderLeaderboard([], false);
+                renderGames([]);
             }
         }
 
-        function initLeaderboard() {
-            fetchLeaderboard();
-            setInterval(fetchLeaderboard, 20000);
+        function initLiveData() {
+            fetchLiveData();
+            setInterval(fetchLiveData, 20000);
         }
 
         const BIRTHDAY_DATE = new Date('2026-08-30T15:00:00+08:00').getTime();
@@ -560,8 +554,8 @@
             document.getElementById('content-area').innerHTML = `
                 <div class="schedule-container">
                     <div class="schedule-header">
-                        <h1>🎉 MIKU.39 BIRTHDAY BASH 🎉</h1>
-                        <p>Hatsune Miku's 19th Birthday • August 30, 2026</p>
+                        <h1>🎉 MIKU-19 BIRTHDAY BASH 🎉</h1>
+                        <p>• August 30, 2026</p>
                         <p style="font-size: 0.95rem; margin-top: 10px;">Organized by Xymiku.39</p>
                     </div>
 
@@ -636,31 +630,8 @@
                     <!-- Games Section -->
                     <div class="games-section">
                         <h2 class="section-title">🎮 Featured Games</h2>
-                        <div class="games-grid">
-                            <a href="#" class="game-card" onclick="alert('Game link would go here - configure in admin dashboard')">
-                                <div class="game-icon">🎯</div>
-                                <div class="game-title">Quiz Master</div>
-                                <div class="game-description">Test your Miku knowledge with our trivia challenge!</div>
-                                <div class="game-link-btn">Join Game</div>
-                            </a>
-                            <a href="#" class="game-card" onclick="alert('Game link would go here - configure in admin dashboard')">
-                                <div class="game-icon">🎵</div>
-                                <div class="game-title">Rhythm Challenge</div>
-                                <div class="game-description">Tap to the beat and earn Mikudollars!</div>
-                                <div class="game-link-btn">Join Game</div>
-                            </a>
-                            <a href="#" class="game-card" onclick="alert('Game link would go here - configure in admin dashboard')">
-                                <div class="game-icon">🎨</div>
-                                <div class="game-title">Creative Contest</div>
-                                <div class="game-description">Show off your artistic talents and vote on entries.</div>
-                                <div class="game-link-btn">Join Game</div>
-                            </a>
-                            <a href="#" class="game-card" onclick="alert('Game link would go here - configure in admin dashboard')">
-                                <div class="game-icon">⚡</div>
-                                <div class="game-title">Speed Race</div>
-                                <div class="game-description">Fast reflexes = big Mikudollars rewards!</div>
-                                <div class="game-link-btn">Join Game</div>
-                            </a>
+                        <div class="games-grid" id="gamesContainer">
+                            <p style="color: var(--text-dim); text-align: center; grid-column: 1 / -1;">Loading games&hellip;</p>
                         </div>
                     </div>
 
@@ -677,10 +648,13 @@
                         <p style="margin-top: 15px; font-size: 0.9rem;">
                             <a href="index.html">← Back to Main</a>
                         </p>
+                        <p style="margin-top: 10px; font-size: 0.8rem; color: var(--text-dim);">
+                            Built by <a href="${CREDIT_JULIAN_URL}" target="_blank" rel="noopener">TheBooleanJulian</a> for <a href="${CREDIT_XYMIKU_URL}" target="_blank" rel="noopener">xymiku.39</a>
+                        </p>
                     </div>
                 </div>
             `;
-            initLeaderboard();
+            initLiveData();
         }
     </script>
 </body>
