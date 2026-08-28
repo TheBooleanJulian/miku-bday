@@ -42,3 +42,4 @@ Commit and push. That's the only push needed — after this:
 - `doGet` (reading leaderboard + games) is intentionally public/unauthenticated — that's what lets `schedule.html` show live data to guests without any login. `doPost` (adding/deleting games) requires `SHARED_SECRET`, which only `admin.html`'s source carries.
 - If you ever edit `Code.gs` again, you need to **Deploy → Manage deployments → edit (pencil) → New version → Deploy** for changes to take effect — saving alone doesn't republish a live deployment.
 - Open the sheet directly any time to bulk-edit attendance/scores or eyeball the numbers — that's the normal workflow now, not a fallback.
+- The sheet currently has a leftover **"Sheet1"** tab from its original setup (unused now that the script reads named `Leaderboard`/`Games` tabs) — safe to delete or rename, it's not read by anything.
