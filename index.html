@@ -119,21 +119,55 @@
             100% { transform: translateY(-10vh) scale(1); }
         }
 
-        .miku-silhouette {
+        .angular-deco {
             position: absolute;
             top: 50%;
             left: 50%;
+            width: 640px;
+            height: 640px;
             transform: translate(-50%, -50%);
-            width: 600px;
-            opacity: 0.15;
-            filter: drop-shadow(0 0 30px var(--cyan)) drop-shadow(0 0 60px var(--magenta));
-            animation: silhouettePulse 4s ease-in-out infinite;
+            opacity: 0.16;
             pointer-events: none;
+            mix-blend-mode: screen;
+            animation: silhouettePulse 4s ease-in-out infinite;
+        }
+
+        .angular-deco .shard {
+            position: absolute;
+            filter: drop-shadow(0 0 24px var(--cyan));
+        }
+
+        .angular-deco .shard.magenta { filter: drop-shadow(0 0 24px var(--magenta)); }
+
+        .angular-deco .shard:nth-child(1) {
+            top: 6%; left: 30%; width: 260px; height: 320px;
+            background: linear-gradient(160deg, var(--cyan), transparent 70%);
+            clip-path: polygon(35% 0%, 100% 8%, 78% 100%, 10% 85%, 0% 30%);
+        }
+        .angular-deco .shard:nth-child(2) {
+            top: 0%; left: 42%; width: 130px; height: 140px;
+            background: linear-gradient(200deg, var(--magenta), transparent 70%);
+            clip-path: polygon(20% 0%, 100% 15%, 85% 100%, 0% 80%);
+        }
+        .angular-deco .shard:nth-child(3) {
+            top: 42%; left: 12%; width: 180px; height: 220px;
+            background: linear-gradient(120deg, var(--cyan), transparent 65%);
+            clip-path: polygon(0% 10%, 70% 0%, 100% 60%, 55% 100%, 0% 85%);
+        }
+        .angular-deco .shard:nth-child(4) {
+            top: 48%; right: 8%; width: 190px; height: 230px;
+            background: linear-gradient(240deg, var(--magenta), transparent 65%);
+            clip-path: polygon(30% 0%, 100% 15%, 90% 90%, 20% 100%, 0% 40%);
+        }
+        .angular-deco .shard:nth-child(5) {
+            bottom: 2%; left: 34%; width: 220px; height: 160px;
+            background: linear-gradient(90deg, var(--cyan), var(--magenta) 80%);
+            clip-path: polygon(10% 0%, 100% 20%, 90% 100%, 0% 80%);
         }
 
         @keyframes silhouettePulse {
-            0%, 100% { opacity: 0.12; filter: drop-shadow(0 0 20px var(--cyan)) drop-shadow(0 0 40px var(--magenta)); }
-            50% { opacity: 0.2; filter: drop-shadow(0 0 40px var(--cyan)) drop-shadow(0 0 80px var(--magenta)); }
+            0%, 100% { opacity: 0.13; }
+            50% { opacity: 0.22; }
         }
 
         /* ===== MAIN LAYOUT ===== */
@@ -733,13 +767,29 @@
             letter-spacing: 1px;
         }
 
-        .signature-avatar {
+        .signature-badge {
             width: 50px;
             height: 50px;
-            border-radius: 50%;
-            border: 2px solid rgba(0, 240, 255, 0.3);
-            object-fit: cover;
-            filter: drop-shadow(0 0 8px rgba(0, 240, 255, 0.3));
+            position: relative;
+            flex-shrink: 0;
+        }
+
+        .signature-badge::before,
+        .signature-badge::after {
+            content: '';
+            position: absolute;
+            inset: 0;
+            clip-path: polygon(30% 0%, 100% 0%, 100% 70%, 70% 100%, 0% 100%, 0% 30%);
+        }
+
+        .signature-badge::before {
+            background: linear-gradient(135deg, var(--cyan), var(--magenta));
+            opacity: 0.25;
+        }
+
+        .signature-badge::after {
+            border: 2px solid var(--cyan);
+            filter: drop-shadow(0 0 8px rgba(0, 240, 255, 0.4));
         }
 
         .activation-section {
@@ -872,6 +922,58 @@
             .main-title { font-size: 48px; }
             .time-value { font-size: 40px; min-width: 70px; }
         }
+
+        /* ===== MOBILE: hero + countdown fit above the fold ===== */
+        @media (max-width: 768px) {
+            .main-container {
+                padding: 8px 10px;
+                gap: 8px;
+            }
+
+            .top-bar {
+                padding: 6px 10px;
+                font-size: 9px;
+                letter-spacing: 1px;
+            }
+
+            .top-bar-left { gap: 10px; }
+            .top-bar-right { gap: 10px; }
+            .brand { font-size: 11px; }
+            .status-pill { padding: 2px 6px; font-size: 8px; }
+            .top-bar-left .status-pill:not(.online) { display: none; }
+
+            .content-grid {
+                gap: 8px;
+            }
+
+            /* Priority order: hero + countdown first, then supporting panels */
+            .content-grid > .panel:first-child { order: 3; }
+            .content-grid > .panel:last-child { order: 4; }
+            .center-column { order: 1; gap: 8px; }
+
+            .hero-section { padding: 10px 8px; }
+            .hatsune-logo { font-size: 8px; letter-spacing: 2px; margin-bottom: 4px; }
+            .hatsune-logo::before, .hatsune-logo::after { width: 20px; }
+            .main-title { font-size: clamp(30px, 13vw, 56px); letter-spacing: 4px; }
+            .subtitle { font-size: 8px; letter-spacing: 2px; margin-top: 4px; }
+
+            .countdown-panel { padding: 12px 10px; }
+            .countdown-label { font-size: 9px; letter-spacing: 1.5px; margin-bottom: 10px; }
+            .countdown-display { gap: 6px; margin-bottom: 12px; }
+            .time-value { font-size: clamp(26px, 9.5vw, 44px); min-width: 0; }
+            .time-separator { font-size: clamp(18px, 6vw, 32px); }
+            .time-label { font-size: 8px; letter-spacing: 1.5px; margin-top: 4px; }
+            .countdown-status { gap: 6px; margin-top: 10px; }
+            .status-item { padding: 6px; }
+            .status-item-label { font-size: 7px; }
+            .status-item-value { font-size: 11px; }
+
+            .event-panel, .bottom-banner { padding: 10px; }
+            .event-grid { grid-template-columns: repeat(2, 1fr); gap: 8px; }
+            .years-text { font-size: 13px; letter-spacing: 4px; }
+
+            .signal-bar { display: none; }
+        }
     </style>
 </head>
 <body>
@@ -880,7 +982,13 @@
         <div class="bg-texture"></div>
         <div class="bg-grid"></div>
         <div class="bg-particles" id="particles"></div>
-        <img src="assets/miku-silhouette.png" alt="" class="miku-silhouette">
+        <div class="angular-deco" aria-hidden="true">
+            <div class="shard"></div>
+            <div class="shard magenta"></div>
+            <div class="shard"></div>
+            <div class="shard magenta"></div>
+            <div class="shard"></div>
+        </div>
     </div>
 
     <!-- Main Content -->
@@ -1195,7 +1303,7 @@
                         <div class="signature-number">39</div>
                         <div class="signature-text">MIKU SIGNATURE</div>
                     </div>
-                    <img src="assets/miku-avatar.png" alt="Miku" class="signature-avatar">
+                    <div class="signature-badge" aria-hidden="true"></div>
                 </div>
 
                 <div class="activation-section">
