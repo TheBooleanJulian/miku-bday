@@ -797,6 +797,153 @@
             text-shadow: 0 0 8px rgba(255, 0, 160, 0.4);
         }
 
+        /* ===== DATA ARCHIVE (POSTER BUTTONS) ===== */
+        .archive-panel {
+            padding: 14px 14px 16px;
+        }
+
+        .archive-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 14px;
+            margin-top: 4px;
+        }
+
+        .poster-btn {
+            appearance: none;
+            -webkit-appearance: none;
+            display: flex;
+            flex-direction: column;
+            padding: 0;
+            background: rgba(0, 0, 0, 0.3);
+            border: 1px solid rgba(0, 240, 255, 0.18);
+            outline: none;
+            cursor: pointer;
+            overflow: hidden;
+            clip-path: polygon(6% 0%, 100% 0%, 100% 92%, 94% 100%, 0% 100%, 0% 8%);
+            transition: border-color 0.3s ease, box-shadow 0.3s ease, transform 0.2s ease;
+        }
+
+        .poster-btn:hover,
+        .poster-btn:focus-visible {
+            border-color: var(--cyan);
+            box-shadow: 0 0 20px rgba(0, 240, 255, 0.3);
+            transform: translateY(-2px);
+        }
+
+        .poster-thumb {
+            aspect-ratio: 3 / 4;
+            background-size: cover;
+            background-position: top center;
+            filter: saturate(0.85) brightness(0.85);
+            position: relative;
+            transition: filter 0.3s ease, transform 0.4s ease;
+        }
+
+        .poster-thumb::after {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background: linear-gradient(180deg, rgba(0, 240, 255, 0.12), rgba(5, 5, 16, 0.35) 70%, rgba(5, 5, 16, 0.65));
+            mix-blend-mode: multiply;
+        }
+
+        .poster-btn:hover .poster-thumb,
+        .poster-btn:focus-visible .poster-thumb {
+            filter: saturate(1) brightness(1);
+        }
+
+        .poster-btn-label {
+            padding: 8px 6px;
+            font-size: 10px;
+            letter-spacing: 1.5px;
+            color: var(--cyan);
+            background: rgba(0, 0, 0, 0.5);
+            border-top: 1px solid rgba(0, 240, 255, 0.15);
+            text-align: center;
+        }
+
+        /* ===== LIGHTBOX ===== */
+        .lightbox {
+            position: fixed;
+            inset: 0;
+            z-index: 1000;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.25s ease;
+        }
+
+        .lightbox.open {
+            opacity: 1;
+            pointer-events: auto;
+        }
+
+        .lightbox-backdrop {
+            position: absolute;
+            inset: 0;
+            background: rgba(2, 4, 10, 0.88);
+            backdrop-filter: blur(4px);
+        }
+
+        .lightbox-frame {
+            position: relative;
+            max-width: min(560px, 92vw);
+            max-height: 90vh;
+            background: var(--bg-panel);
+            border: 1px solid rgba(0, 240, 255, 0.3);
+            box-shadow: 0 0 40px rgba(0, 240, 255, 0.25), 0 0 80px rgba(255, 0, 160, 0.15);
+            padding: 14px;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            clip-path: polygon(3% 0%, 100% 0%, 100% 97%, 97% 100%, 0% 100%, 0% 3%);
+            transform: scale(0.94);
+            transition: transform 0.25s ease;
+        }
+
+        .lightbox.open .lightbox-frame {
+            transform: scale(1);
+        }
+
+        .lightbox-caption {
+            font-family: 'Orbitron', sans-serif;
+            font-size: 12px;
+            letter-spacing: 3px;
+            color: var(--cyan);
+            text-shadow: 0 0 8px rgba(0, 240, 255, 0.5);
+        }
+
+        .lightbox-close {
+            position: absolute;
+            top: -14px;
+            right: -14px;
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            background: var(--bg-dark);
+            border: 1px solid var(--magenta);
+            color: var(--magenta);
+            font-size: 18px;
+            line-height: 1;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 0 10px rgba(255, 0, 160, 0.4);
+        }
+
+        #lightboxImg {
+            width: 100%;
+            max-height: 75vh;
+            object-fit: contain;
+            border: 1px solid rgba(0, 240, 255, 0.15);
+            display: block;
+        }
+
         /* Bottom Banner */
         .bottom-banner {
             text-align: center;
@@ -1109,6 +1256,11 @@
             .simulation-panel { padding: 12px; }
             .simulation-btn { padding: 14px 10px; }
             .simulation-btn-sub { font-size: 9px; }
+
+            .archive-panel { padding: 10px 10px 12px; }
+            .archive-grid { gap: 8px; }
+            .poster-btn-label { font-size: 9px; padding: 6px 4px; }
+            .lightbox-close { top: -10px; right: -10px; width: 28px; height: 28px; }
             .event-grid { grid-template-columns: repeat(2, 1fr); gap: 8px; }
             .years-text { font-size: 13px; letter-spacing: 4px; }
 
@@ -1376,6 +1528,25 @@
                     </div>
                 </div>
 
+                <!-- Data Archive -->
+                <div class="panel archive-panel">
+                    <div class="corner-br"></div>
+                    <div class="event-header">
+                        <span style="color: var(--magenta);">&#9670;</span>
+                        DATA ARCHIVE
+                    </div>
+                    <div class="archive-grid">
+                        <button type="button" class="poster-btn" data-img="assets/1.png" data-title="EVENT POSTER">
+                            <span class="poster-thumb" style="background-image: url('assets/1.png');"></span>
+                            <span class="poster-btn-label">&#128196; EVENT POSTER</span>
+                        </button>
+                        <button type="button" class="poster-btn" data-img="assets/2.png" data-title="FULL SCHEDULE">
+                            <span class="poster-thumb" style="background-image: url('assets/2.png');"></span>
+                            <span class="poster-btn-label">&#128197; FULL SCHEDULE</span>
+                        </button>
+                    </div>
+                </div>
+
                 <!-- Bottom Banner -->
                 <div class="panel bottom-banner">
                     <div class="corner-br"></div>
@@ -1541,6 +1712,16 @@
                     &copy; 2026 MIKU-19 PROJECT // ALL SYSTEMS RESERVED
                 </div>
             </div>
+        </div>
+    </div>
+
+    <!-- Lightbox -->
+    <div class="lightbox" id="lightbox" aria-hidden="true">
+        <div class="lightbox-backdrop" id="lightboxBackdrop"></div>
+        <div class="lightbox-frame">
+            <button type="button" class="lightbox-close" id="lightboxClose" aria-label="Close">&times;</button>
+            <div class="lightbox-caption" id="lightboxCaption"></div>
+            <img id="lightboxImg" src="" alt="">
         </div>
     </div>
 
@@ -1790,6 +1971,37 @@
             document.body.appendChild(flash);
             flash.addEventListener('animationend', () => flash.remove());
         }
+
+        // ===== POSTER LIGHTBOX =====
+        const lightbox = document.getElementById('lightbox');
+        const lightboxImg = document.getElementById('lightboxImg');
+        const lightboxCaption = document.getElementById('lightboxCaption');
+        const lightboxClose = document.getElementById('lightboxClose');
+        const lightboxBackdrop = document.getElementById('lightboxBackdrop');
+
+        function openLightbox(src, title) {
+            lightboxImg.src = src;
+            lightboxImg.alt = title;
+            lightboxCaption.textContent = title;
+            lightbox.classList.add('open');
+            lightbox.setAttribute('aria-hidden', 'false');
+            document.body.style.overflow = 'hidden';
+        }
+
+        function closeLightbox() {
+            lightbox.classList.remove('open');
+            lightbox.setAttribute('aria-hidden', 'true');
+            document.body.style.overflow = '';
+        }
+
+        document.querySelectorAll('.poster-btn').forEach(btn => {
+            btn.addEventListener('click', () => openLightbox(btn.dataset.img, btn.dataset.title));
+        });
+        lightboxClose.addEventListener('click', closeLightbox);
+        lightboxBackdrop.addEventListener('click', closeLightbox);
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape') closeLightbox();
+        });
     </script>
 </body>
 </html>
