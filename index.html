@@ -377,7 +377,25 @@
             border-radius: 50%;
             border: 2px solid rgba(0, 240, 255, 0.4);
             position: relative;
-            cursor: pointer;
+            cursor: grab;
+            touch-action: none;
+            user-select: none;
+            transition: border-color 0.2s, box-shadow 0.2s;
+        }
+
+        .knob:hover {
+            border-color: rgba(0, 240, 255, 0.7);
+        }
+
+        .knob.dragging {
+            cursor: grabbing;
+            border-color: var(--magenta);
+            box-shadow: 0 0 10px rgba(255, 0, 160, 0.5);
+        }
+
+        .knob.at-max {
+            border-color: var(--magenta);
+            box-shadow: 0 0 8px rgba(255, 0, 160, 0.6);
         }
 
         .knob::after {
@@ -602,6 +620,125 @@
         .sync-bar div.active {
             background: var(--cyan);
             box-shadow: 0 0 6px var(--cyan);
+        }
+
+        /* ===== SIMULATION ACCESS BUTTON ===== */
+        .simulation-panel {
+            padding: 18px;
+            text-align: center;
+        }
+
+        .simulation-btn {
+            appearance: none;
+            -webkit-appearance: none;
+            width: 100%;
+            padding: 20px 16px;
+            background: rgba(0, 0, 0, 0.3);
+            border: 2px solid rgba(0, 240, 255, 0.15);
+            outline: none;
+            color: var(--text-dim);
+            font-family: 'Orbitron', sans-serif;
+            cursor: not-allowed;
+            position: relative;
+            clip-path: polygon(3% 0%, 100% 0%, 97% 100%, 0% 100%);
+            transition: background 0.4s ease, border-color 0.4s ease, box-shadow 0.4s ease, color 0.4s ease;
+        }
+
+        .simulation-btn:focus-visible {
+            border-color: var(--cyan);
+        }
+
+        .simulation-btn-label {
+            display: block;
+            font-size: clamp(16px, 3vw, 24px);
+            font-weight: 700;
+            letter-spacing: 4px;
+        }
+
+        .simulation-btn-sub {
+            display: block;
+            font-family: 'Share Tech Mono', monospace;
+            font-size: 10px;
+            letter-spacing: 2px;
+            margin-top: 8px;
+            color: var(--text-dim);
+        }
+
+        .simulation-btn.enabled {
+            color: var(--bg-dark);
+            background: linear-gradient(120deg, var(--cyan), var(--magenta));
+            border-color: transparent;
+            cursor: pointer;
+            box-shadow: 0 0 30px rgba(0, 240, 255, 0.5), 0 0 60px rgba(255, 0, 160, 0.3);
+            animation: simPulse 2s ease-in-out infinite;
+        }
+
+        .simulation-btn.enabled .simulation-btn-sub {
+            color: rgba(5, 5, 16, 0.7);
+        }
+
+        @keyframes simPulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.015); }
+        }
+
+        .simulation-btn.denied {
+            animation: denyShake 0.4s ease;
+            border-color: rgba(255, 0, 160, 0.7);
+        }
+
+        @keyframes denyShake {
+            0%, 100% { transform: translateX(0); }
+            25% { transform: translateX(-5px); }
+            75% { transform: translateX(5px); }
+        }
+
+        /* ===== DEBUG MODE ===== */
+        .debug-badge {
+            display: none;
+            color: var(--magenta);
+            font-size: 9px;
+            letter-spacing: 1px;
+            animation: livePulse 1s ease-in-out infinite;
+        }
+
+        body.debug-mode .debug-badge {
+            display: inline;
+        }
+
+        body.debug-mode .main-title,
+        body.debug-mode .glitch-layer {
+            animation-duration: 1.4s;
+        }
+
+        body.debug-mode .angular-deco {
+            animation-duration: 1.6s;
+            opacity: 0.26;
+        }
+
+        body.debug-mode .harmonic-bar {
+            animation-duration: 0.5s;
+        }
+
+        body.debug-mode .top-bar,
+        body.debug-mode .panel {
+            border-color: rgba(255, 0, 160, 0.3);
+        }
+
+        .debug-flash {
+            position: fixed;
+            inset: 0;
+            background: radial-gradient(circle, rgba(255, 0, 160, 0.35), transparent 70%);
+            z-index: 999;
+            pointer-events: none;
+            opacity: 0;
+            animation: debugFlash 0.6s ease-out forwards;
+        }
+
+        @keyframes debugFlash {
+            0% { opacity: 0; }
+            30% { opacity: 1; }
+            100% { opacity: 0; }
         }
 
         /* Event Panel */
@@ -969,6 +1106,9 @@
             .status-item-value { font-size: 11px; }
 
             .event-panel, .bottom-banner { padding: 10px; }
+            .simulation-panel { padding: 12px; }
+            .simulation-btn { padding: 14px 10px; }
+            .simulation-btn-sub { font-size: 9px; }
             .event-grid { grid-template-columns: repeat(2, 1fr); gap: 8px; }
             .years-text { font-size: 13px; letter-spacing: 4px; }
 
@@ -1001,6 +1141,7 @@
                 <div class="status-pill">VOCAL SYNTHESIS: ACTIVE</div>
             </div>
             <div class="top-bar-right">
+                <span class="debug-badge" id="debugBadge">&#9888; DEBUG OVERRIDE ACTIVE</span>
                 <span style="color: var(--text-dim); font-size: 10px;">SIGNAL: 39</span>
                 <div class="signal-bar">
                     <div></div><div></div><div></div><div></div><div></div>
@@ -1089,15 +1230,15 @@
                     </div>
                     <div class="knobs-row">
                         <div class="knob-group">
-                            <div class="knob"></div>
+                            <div class="knob" id="knob-filter-cutoff"></div>
                             <span class="knob-label">CUTOFF</span>
                         </div>
                         <div class="knob-group">
-                            <div class="knob"></div>
+                            <div class="knob" id="knob-filter-res"></div>
                             <span class="knob-label">RES</span>
                         </div>
                         <div class="knob-group">
-                            <div class="knob"></div>
+                            <div class="knob" id="knob-filter-env"></div>
                             <span class="knob-label">ENV</span>
                         </div>
                     </div>
@@ -1176,11 +1317,11 @@
                     <div class="countdown-status">
                         <div class="status-item">
                             <div class="status-item-label">SYNC</div>
-                            <div class="status-item-value">98%</div>
-                            <div class="sync-bar">
-                                <div class="active"></div><div class="active"></div><div class="active"></div>
-                                <div class="active"></div><div class="active"></div><div class="active"></div>
-                                <div class="active"></div><div class="active"></div><div class="active"></div>
+                            <div class="status-item-value" id="syncValue">0%</div>
+                            <div class="sync-bar" id="syncBar">
+                                <div></div><div></div><div></div>
+                                <div></div><div></div><div></div>
+                                <div></div><div></div><div></div>
                                 <div></div><div></div>
                             </div>
                         </div>
@@ -1193,6 +1334,15 @@
                             <div class="status-item-value live">LIVE</div>
                         </div>
                     </div>
+                </div>
+
+                <!-- Simulation Access -->
+                <div class="panel simulation-panel">
+                    <div class="corner-br"></div>
+                    <button type="button" id="simulationBtn" class="simulation-btn" aria-disabled="true">
+                        <span class="simulation-btn-label">ENTER THE SIMULATION</span>
+                        <span class="simulation-btn-sub" id="simulationSub">LOCKED &mdash; AWAITING COUNTDOWN COMPLETION</span>
+                    </button>
                 </div>
 
                 <!-- Event Initialization -->
@@ -1414,10 +1564,27 @@
         }
 
         // ===== COUNTDOWN TIMER =====
+        const COUNTDOWN_TARGET = new Date('2026-08-30T15:00:00+08:00');
+        const SYNC_START = new Date('2026-08-14T00:00:00+08:00');
+
+        const syncValueEl = document.getElementById('syncValue');
+        const syncBarEls = document.querySelectorAll('#syncBar > div');
+
+        let countdownComplete = false;
+        let debugUnlocked = false;
+
+        function updateSync(now) {
+            let pct = ((now - SYNC_START) / (COUNTDOWN_TARGET - SYNC_START)) * 100;
+            pct = Math.max(0, Math.min(100, pct));
+            const rounded = Math.round(pct);
+            syncValueEl.textContent = rounded + '%';
+            const activeCount = Math.round((rounded / 100) * syncBarEls.length);
+            syncBarEls.forEach((el, i) => el.classList.toggle('active', i < activeCount));
+        }
+
         function updateCountdown() {
-            const target = new Date('2026-08-30T15:00:00+08:00');
             const now = new Date();
-            const diff = target - now;
+            const diff = COUNTDOWN_TARGET - now;
 
             if (diff > 0) {
                 const days = Math.floor(diff / (1000 * 60 * 60 * 24));
@@ -1434,10 +1601,44 @@
                 document.getElementById('hours').textContent = '00';
                 document.getElementById('minutes').textContent = '00';
                 document.getElementById('seconds').textContent = '00';
+                if (!countdownComplete) {
+                    countdownComplete = true;
+                    refreshSimulationButton();
+                }
             }
+
+            updateSync(now);
         }
         updateCountdown();
         setInterval(updateCountdown, 1000);
+
+        // ===== SIMULATION ACCESS BUTTON =====
+        const simulationBtn = document.getElementById('simulationBtn');
+        const simulationSub = document.getElementById('simulationSub');
+
+        function refreshSimulationButton() {
+            const enabled = countdownComplete || debugUnlocked;
+            simulationBtn.setAttribute('aria-disabled', String(!enabled));
+            simulationBtn.classList.toggle('enabled', enabled);
+            if (!enabled) {
+                simulationSub.textContent = 'LOCKED — AWAITING COUNTDOWN COMPLETION';
+            } else if (countdownComplete) {
+                simulationSub.textContent = 'SYSTEM READY // ACCESS GRANTED';
+            } else {
+                simulationSub.textContent = 'DEBUG OVERRIDE // ACCESS GRANTED';
+            }
+        }
+        refreshSimulationButton();
+
+        simulationBtn.addEventListener('click', () => {
+            if (!simulationBtn.classList.contains('enabled')) {
+                simulationBtn.classList.remove('denied');
+                void simulationBtn.offsetWidth;
+                simulationBtn.classList.add('denied');
+                return;
+            }
+            window.location.href = 'schedule.html?unlocked=true';
+        });
 
         // ===== FREQUENCY CANVAS =====
         const freqCanvas = document.getElementById('freqCanvas');
@@ -1529,24 +1730,66 @@
         setInterval(randomGlitch, 3000);
 
         // ===== KNOB INTERACTION =====
+        const KNOB_MIN = -135;
+        const KNOB_MAX = 135;
+        const COMBO_KNOB_IDS = ['knob-filter-cutoff', 'knob-filter-res', 'knob-filter-env'];
+        const COMBO_THRESHOLD = 130;
+
         document.querySelectorAll('.knob').forEach(knob => {
             let rotation = 0;
-            knob.addEventListener('mousedown', (e) => {
+
+            function setRotation(r) {
+                rotation = Math.max(KNOB_MIN, Math.min(KNOB_MAX, r));
+                knob.style.transform = `rotate(${rotation}deg)`;
+                knob.dataset.rotation = rotation;
+                knob.classList.toggle('at-max', rotation >= COMBO_THRESHOLD);
+                if (COMBO_KNOB_IDS.includes(knob.id)) {
+                    checkSecretCombo();
+                }
+            }
+
+            knob.addEventListener('pointerdown', (e) => {
+                knob.setPointerCapture(e.pointerId);
+                knob.classList.add('dragging');
                 const startY = e.clientY;
                 const startRot = rotation;
+
                 function onMove(ev) {
                     const delta = startY - ev.clientY;
-                    rotation = Math.max(-135, Math.min(135, startRot + delta));
-                    knob.style.transform = `rotate(${rotation}deg)`;
+                    setRotation(startRot + delta);
                 }
                 function onUp() {
-                    document.removeEventListener('mousemove', onMove);
-                    document.removeEventListener('mouseup', onUp);
+                    knob.classList.remove('dragging');
+                    knob.removeEventListener('pointermove', onMove);
+                    knob.removeEventListener('pointerup', onUp);
+                    knob.removeEventListener('pointercancel', onUp);
                 }
-                document.addEventListener('mousemove', onMove);
-                document.addEventListener('mouseup', onUp);
+                knob.addEventListener('pointermove', onMove);
+                knob.addEventListener('pointerup', onUp);
+                knob.addEventListener('pointercancel', onUp);
             });
         });
+
+        // ===== DEBUG / EASTER EGG MODE =====
+        function checkSecretCombo() {
+            if (debugUnlocked) return;
+            const allMax = COMBO_KNOB_IDS.every(id => {
+                const el = document.getElementById(id);
+                return el && parseFloat(el.dataset.rotation || '0') >= COMBO_THRESHOLD;
+            });
+            if (allMax) activateDebugMode();
+        }
+
+        function activateDebugMode() {
+            debugUnlocked = true;
+            document.body.classList.add('debug-mode');
+            refreshSimulationButton();
+
+            const flash = document.createElement('div');
+            flash.className = 'debug-flash';
+            document.body.appendChild(flash);
+            flash.addEventListener('animationend', () => flash.remove());
+        }
     </script>
 </body>
 </html>
