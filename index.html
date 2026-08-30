@@ -1511,9 +1511,9 @@
                 <!-- Simulation Access -->
                 <div class="panel simulation-panel">
                     <div class="corner-br"></div>
-                    <button type="button" id="simulationBtn" class="simulation-btn" aria-disabled="true">
+                    <button type="button" id="simulationBtn" class="simulation-btn enabled" aria-disabled="false">
                         <span class="simulation-btn-label">ENTER THE SIMULATION</span>
-                        <span class="simulation-btn-sub" id="simulationSub">LOCKED &mdash; AWAITING COUNTDOWN COMPLETION</span>
+                        <span class="simulation-btn-sub" id="simulationSub">SYSTEM READY // ACCESS GRANTED</span>
                     </button>
                 </div>
 
@@ -1817,17 +1817,18 @@
         // ===== SIMULATION ACCESS BUTTON =====
         const simulationBtn = document.getElementById('simulationBtn');
         const simulationSub = document.getElementById('simulationSub');
+        const simulationUnlocked = true; // keep countdown running, but grant access now
 
         function refreshSimulationButton() {
-            const enabled = countdownComplete || debugUnlocked;
+            const enabled = countdownComplete || debugUnlocked || simulationUnlocked;
             simulationBtn.setAttribute('aria-disabled', String(!enabled));
             simulationBtn.classList.toggle('enabled', enabled);
             if (!enabled) {
                 simulationSub.textContent = 'LOCKED — AWAITING COUNTDOWN COMPLETION';
-            } else if (countdownComplete) {
-                simulationSub.textContent = 'SYSTEM READY // ACCESS GRANTED';
-            } else {
+            } else if (debugUnlocked) {
                 simulationSub.textContent = 'DEBUG OVERRIDE // ACCESS GRANTED';
+            } else {
+                simulationSub.textContent = 'SYSTEM READY // ACCESS GRANTED';
             }
         }
         refreshSimulationButton();
