@@ -490,16 +490,27 @@
             `;
         }
 
+        const DEFAULT_GAMES = [
+            {
+                emoji: '🎮',
+                title: 'Miku Quiz',
+                description: 'Play our live Miku quiz!',
+                url: 'https://miku-kahoot.thebooleanjulian.dev/play',
+            },
+        ];
+
         function renderGames(games) {
             const container = document.getElementById('gamesContainer');
             if (!container) return;
 
-            if (games.length === 0) {
-                container.innerHTML = '<p style="color: var(--text-dim); text-align: center; grid-column: 1 / -1;">Games will appear here once added in the admin dashboard.</p>';
-                return;
-            }
+            const seen = new Set();
+            const all = [...DEFAULT_GAMES, ...(games || [])].filter(g => {
+                if (seen.has(g.url)) return false;
+                seen.add(g.url);
+                return true;
+            });
 
-            container.innerHTML = games.map(g => `
+            container.innerHTML = all.map(g => `
                 <a href="${g.url}" class="game-card" target="_blank" rel="noopener">
                     <div class="game-icon">${g.emoji}</div>
                     <div class="game-title">${escapeHtml(g.title)}</div>
